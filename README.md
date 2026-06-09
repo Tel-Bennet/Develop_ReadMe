@@ -29,40 +29,16 @@ hidden: false
 
 Stub filenames follow `<method>_<path-with-dashes>.md` and the `operationId` is the same slug.
 
-## Syncing to ReadMe
+## Syncing to ReadMe (Git Sync)
 
-Install the [`rdme`](https://github.com/readmeio/rdme) CLI once:
+This repo is connected to the ReadMe project via **ReadMe Git Sync** (the ReadMe GitHub App). Sync is bi-directional and automatic:
 
-```bash
-npm install -g rdme
-```
+- **Push to the `v1.0` branch** → the docs site updates automatically. No CI, CLI, or API keys required.
+- **Edits made in the ReadMe web editor** → ReadMe commits them back to this repo on `v1.0`.
 
-Authenticate (one time):
+Because ReadMe can commit to this repo, **always `git pull` before starting local work** to avoid conflicts.
 
-```bash
-rdme login
-```
-
-Upload the OpenAPI spec:
-
-```bash
-rdme openapi reference/openapi.json --id=<OPENAPI_DEFINITION_ID>
-```
-
-Upload Guides + Reference Markdown:
-
-```bash
-rdme docs ./docs --version=<VERSION>
-rdme docs ./reference --version=<VERSION>
-```
-
-Replace `<OPENAPI_DEFINITION_ID>` and `<VERSION>` with values from your ReadMe project settings.
-
-CI does the same on every push to `main` — see `.github/workflows/readme-sync.yml`. Required secrets:
-
-- `RDME_API_KEY` — ReadMe project API key
-- `RDME_OPENAPI_ID` — OpenAPI definition id (from `rdme openapi` first run)
-- `RDME_VERSION` — ReadMe version slug (e.g. `v1.0`)
+The branch name (`v1.0`) corresponds to the ReadMe version slug. New ReadMe versions get their own branches.
 
 ## Mintlify → ReadMe converter
 
