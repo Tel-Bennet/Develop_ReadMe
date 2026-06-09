@@ -1,0 +1,9 @@
+- get_v1-0-packages
+- post_v1-0-packages
+- get_v1-0-packages-subscriptions
+- post_v1-0-packages-update
+- post_v1-0-packages-delete
+- get_v1-0-packages-items
+- post_v1-0-packages-items-add
+- post_v1-0-packages-items-update
+- post_v1-0-packages-items-delete

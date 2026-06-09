@@ -1,0 +1,9 @@
+- post_v1-0-message-routes
+- get_v1-0-message-routes
+- post_v1-0-message-routes-update
+- post_v1-0-message-outbound
+- get_v1-0-message-details
+- get_v1-0-message-search
+- get_v1-0-message-filter
+- post_v1-0-message-routes-delete
+- post_v1-0-message-device-delivery

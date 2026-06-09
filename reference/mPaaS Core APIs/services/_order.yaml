@@ -1,0 +1,8 @@
+- get_v1-0-services
+- post_v1-0-services
+- post_v1-0-services-update
+- post_v1-0-services-delete
+- get_v1-0-services-items
+- post_v1-0-services-items-add
+- post_v1-0-services-items-update
+- post_v1-0-services-items-delete

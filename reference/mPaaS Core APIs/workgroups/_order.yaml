@@ -1,0 +1,7 @@
+- post_v1-0-workgroups
+- get_v1-0-workgroups
+- post_v1-0-workgroups-update
+- post_v1-0-workgroups-activity
+- post_v1-0-workgroups-activity-update
+- post_v1-0-workgroups-activity-delete
+- post_v1-0-workgroups-delete
