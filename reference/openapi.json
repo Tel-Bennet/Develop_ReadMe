@@ -34,16 +34,6 @@
         "description": "Authenticates your account credentials and returns a Bearer token required for all subsequent API requests. Include this token in the `Authorization: Bearer <token>` header on every call. Tokens expire and must be refreshed. Use the optional `ApiEndpoint` field to scope a token to a specific endpoint URL for tighter security.\n\n**What this does:** Returns a `token` string and `tokenExpiry` timestamp. Include the token as `Authorization: Bearer <token>` on every subsequent request. The optional `ApiEndpoint` field scopes the token to a single endpoint URL — a token scoped to `/v1.0/numbers/provision` will be rejected by any other endpoint. Re-authenticate from scratch when a token expires; there is no refresh mechanism.\n\n**Next steps:**\n- Use the token on any other endpoint — `POST /v1.0/numbers/provision`, `POST /v1.0/message/outbound`, etc.",
         "security": [],
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"AccountKey\": \"DID-1234567ab-1a2b-3cd4-...-...........\",\n  \"AccountSecret\": \"abcdeABCdef...\",\n  \"ApiEndpoint\": \"https://api.telegent.com/v1.0/numbers/provision\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/oauth2/tokens \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"AccountKey\": \"DID-1234567ab-1a2b-3cd4-...-...........\",\n    \"AccountSecret\": \"abcdeABCdef...\",\n    \"ApiEndpoint\": \"https://api.telegent.com/v1.0/numbers/provision\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the Bearer token and expiry timestamp",
@@ -373,6 +363,11 @@
                     "example": "https://api.telegent.com/v1.0/numbers/provision"
                   }
                 }
+              },
+              "example": {
+                "AccountKey": "DID-1234567ab-1a2b-3cd4-...-...........",
+                "AccountSecret": "abcdeABCdef...",
+                "ApiEndpoint": "https://api.telegent.com/v1.0/numbers/provision"
               }
             }
           }
@@ -387,16 +382,6 @@
         "summary": "Search Available Numbers",
         "description": "Search for available phone numbers before provisioning. Filter by area code or zip code, required capabilities (voice, SMS/MMS), and message type. Returns a paginated list of matching numbers. Run this step first to confirm number availability in your target area before calling the Number Provision endpoint.\n\n**What this does:** Returns a paginated list of available area code and zip code combinations that have numbers matching your criteria. This tells you which area codes have available inventory before you commit to a provision call. Each result includes an NGP code and area code to use in `POST /v1.0/numbers/provision`.\n\n**Next steps:**\n- Provision a number from the results — `POST /v1.0/numbers/provision`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"NumberType\": \"mobile\",\n  \"MessageType\": \"p2p\",\n  \"MessageEnabled\": true,\n  \"VoiceEnabled\": true,\n  \"PageNumber\": 1,\n  \"AreaCode\": \"201\",\n  \"ZipCode\": \"\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/availability \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"NumberType\": \"mobile\",\n    \"MessageType\": \"p2p\",\n    \"MessageEnabled\": true,\n    \"VoiceEnabled\": true,\n    \"PageNumber\": 1,\n    \"AreaCode\": \"201\",\n    \"ZipCode\": \"\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns a paginated list of available phone numbers matching your criteria",
@@ -772,6 +757,15 @@
                     "example": ""
                   }
                 }
+              },
+              "example": {
+                "NumberType": "mobile",
+                "MessageType": "p2p",
+                "MessageEnabled": true,
+                "VoiceEnabled": true,
+                "PageNumber": 1,
+                "AreaCode": "201",
+                "ZipCode": ""
               }
             }
           }
@@ -786,16 +780,6 @@
         "summary": "Number Provision (Purchase/Order)",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Required:** Message Route ID (MRID) — `POST /v1.0/message/routes`\n- **Optional:** Voice Route ID (CRID) — `POST /v1.0/voice/routes` *(only needed if `VoiceEnabled: true`)*\n- **Optional:** Subscriber ID (TSUID) — `POST /v1.0/subscribers/create` *(to assign the number at provision time)*\n\n---\n\nPurchase and activate a phone number on your account. Before provisioning, ensure you have already created a Message Route (MRID) and Voice Route (CRID) — numbers provisioned without routes will have no call or message handling. Specify the number classification (`mvno` for full messaging and voice, `iot` for data and p2p messaging only), and required capabilities. Returns an OrderId for status tracking.\n\n**What this does:** Purchases and activates the number, returning an `OrderId`, the assigned phone number in E.164 format, a `PhoneNumberId` (`NID-`), and an eSIM QR code (if applicable). The `OrderId` can be used to track provisioning status.\n\n**Next steps:**\n- Check order status — `GET /v1.0/numbers/order`\n- Send a test message — `POST /v1.0/message/outbound`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"NumberType\": \"iot\",\n  \"MessageType\": \"p2p\",\n  \"MessageEnabled\": true,\n  \"VoiceEnabled\": false,\n  \"DataEnabled\": true,\n  \"MessageRouteId\": \"MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a\",\n  \"VoiceRouteId\": \"CRID-4dec6beb-3985-444b-8c06-8baa70dc145\",\n  \"AreaCode\": \"201\",\n  \"ZipCode\": \"84043\",\n  \"ICCID\": \"8901240397190195850\",\n  \"ProductType\": \"Sms+Data\",\n  \"AssignedSubscriberId\": \"TSUID-1234567999\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/provision \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"NumberType\": \"iot\",\n    \"MessageType\": \"p2p\",\n    \"MessageEnabled\": true,\n    \"VoiceEnabled\": false,\n    \"DataEnabled\": true,\n    \"MessageRouteId\": \"MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a\",\n    \"VoiceRouteId\": \"CRID-4dec6beb-3985-444b-8c06-8baa70dc145\",\n    \"AreaCode\": \"201\",\n    \"ZipCode\": \"84043\",\n    \"ICCID\": \"8901240397190195850\",\n    \"ProductType\": \"Sms+Data\",\n    \"AssignedSubscriberId\": \"TSUID-1234567999\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the order ID, assigned phone number, and provisioning status",
@@ -1198,6 +1182,20 @@
                     "example": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
                   }
                 }
+              },
+              "example": {
+                "NumberType": "iot",
+                "MessageType": "p2p",
+                "MessageEnabled": true,
+                "VoiceEnabled": false,
+                "DataEnabled": true,
+                "MessageRouteId": "MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a",
+                "VoiceRouteId": "CRID-4dec6beb-3985-444b-8c06-8baa70dc145",
+                "AreaCode": "201",
+                "ZipCode": "84043",
+                "ICCID": "8901240397190195850",
+                "ProductType": "Sms+Data",
+                "AssignedSubscriberId": "TSUID-1234567999"
               }
             }
           }
@@ -1212,16 +1210,6 @@
         "summary": "Numbers - Port In",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Recommended:** Confirm the number is portable first — `POST /v1.0/numbers/portin/eligibility`\n- **Required:** Losing carrier name, account number, account password, and subscriber billing address\n\n---\n\nTransfer an existing phone number from another carrier into your Telegent account. Before submitting a port-in, run the Port-In Eligibility check to confirm the number can be ported. You will need the losing carrier name, account number, account password, and the subscriber's billing address for LNP (Local Number Portability) compliance.\n\n**What this does:** Submits the port request to the carrier and returns an `OrderId` with an initial status of `Pending`. Monitor the order using the `OrderId`. Port requests typically take 1-5 business days to complete.\n\n**Next steps:**\n- Track the port order status — `GET /v1.0/numbers/order`\n- Cancel if needed — `POST /v1.0/numbers/portin/cancel`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PortInNumber\": \"+15555551234\",\n  \"ICCID\": \"8901240397190195850\",\n  \"CurrentCarrierName\": \"Telegent\",\n  \"CurrentAccountNumber\": \"46512222\",\n  \"CurrentAccountPassword\": \"0000\",\n  \"TargetPortinClassification\": \"mvno\",\n  \"SubscriberName\": \"Telegent\",\n  \"CurrentBillingAddress\": {\n    \"Street1\": \"2701 N Thanksgiving Way\",\n    \"Street2\": \"Suite 202\",\n    \"City\": \"Lehi\",\n    \"State\": \"UT\",\n    \"Zip\": \"84043\"\n  }\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/portin \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PortInNumber\": \"+15555551234\",\n    \"ICCID\": \"8901240397190195850\",\n    \"CurrentCarrierName\": \"Telegent\",\n    \"CurrentAccountNumber\": \"46512222\",\n    \"CurrentAccountPassword\": \"0000\",\n    \"TargetPortinClassification\": \"mvno\",\n    \"SubscriberName\": \"Telegent\",\n    \"CurrentBillingAddress\": {\"Street1\": \"2701 N Thanksgiving Way\", \"Street2\": \"Suite 202\", \"City\": \"Lehi\", \"State\": \"UT\", \"Zip\": \"84043\"}\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the port-in order ID and initial status",
@@ -1610,6 +1598,22 @@
                     "example": "John Doe"
                   }
                 }
+              },
+              "example": {
+                "PortInNumber": "+15555551234",
+                "ICCID": "8901240397190195850",
+                "CurrentCarrierName": "Telegent",
+                "CurrentAccountNumber": "46512222",
+                "CurrentAccountPassword": "0000",
+                "TargetPortinClassification": "mvno",
+                "SubscriberName": "Telegent",
+                "CurrentBillingAddress": {
+                  "Street1": "2701 N Thanksgiving Way",
+                  "Street2": "Suite 202",
+                  "City": "Lehi",
+                  "State": "UT",
+                  "Zip": "84043"
+                }
               }
             }
           }
@@ -1624,16 +1628,6 @@
         "summary": "Numbers - Port In Eligibility",
         "description": "Check if a phone number is eligible for port-in before submitting a full port request. Returns carrier information and eligibility status.\n\n**What this does:** Returns a `Eligible` boolean, the number's current carrier, and number type. Run this before submitting a port-in to avoid failed orders. If `Eligible` is false, the `Message` field explains why.\n\n**Next steps:**\n- If eligible, submit the port-in — `POST /v1.0/numbers/portin`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+15555551234\",\n  \"TargetClassification\": \"Mobile\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/portin/eligibility \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+15555551234\",\n    \"TargetClassification\": \"Mobile\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Port In Eligibility",
@@ -1959,6 +1953,10 @@
                     "example": "Mobile"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+15555551234",
+                "TargetClassification": "Mobile"
               }
             }
           }
@@ -1973,16 +1971,6 @@
         "summary": "Numbers - Update Port In",
         "description": "Update an existing port-in order with new information such as carrier details, account credentials, or billing address before the port completes.\n\n**What this does:** Returns confirmation that the port-in order has been updated. Use this before the port completes if the carrier details or billing address provided were incorrect.\n\n**Next steps:**\n- Check order status — `GET /v1.0/numbers/order`\n- Cancel if needed — `POST /v1.0/numbers/portin/cancel`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"OrderId\": \"JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4\",\n  \"CurrentCarrierName\": \"Updated Carrier\",\n  \"CurrentAccountNumber\": \"46512222\",\n  \"CurrentAccountPassword\": \"0000\",\n  \"PortInDate\": \"2026-06-01\",\n  \"TargetPortinClassification\": \"Mobile\",\n  \"SubscriberName\": \"John Doe\",\n  \"ICCID\": \"89014103211118510720\",\n  \"CurrentBillingAddress\": {\n    \"Street1\": \"123 N Address Way\",\n    \"Street2\": \"Suite 010\",\n    \"City\": \"Townsville\",\n    \"State\": \"UT\",\n    \"Zip\": \"84048\"\n  }\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/portin/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"OrderId\": \"JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4\",\n    \"CurrentCarrierName\": \"Updated Carrier\",\n    \"CurrentAccountNumber\": \"46512222\",\n    \"CurrentAccountPassword\": \"0000\",\n    \"PortInDate\": \"2026-06-01\",\n    \"TargetPortinClassification\": \"Mobile\",\n    \"SubscriberName\": \"John Doe\",\n    \"ICCID\": \"89014103211118510720\",\n    \"CurrentBillingAddress\": {\n      \"Street1\": \"123 N Address Way\",\n      \"City\": \"Townsville\",\n      \"State\": \"UT\",\n      \"Zip\": \"84048\"\n    }\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Port In",
@@ -2360,6 +2348,23 @@
                     "example": "89014103211118510720"
                   }
                 }
+              },
+              "example": {
+                "OrderId": "JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4",
+                "CurrentCarrierName": "Updated Carrier",
+                "CurrentAccountNumber": "46512222",
+                "CurrentAccountPassword": "0000",
+                "PortInDate": "2026-06-01",
+                "TargetPortinClassification": "Mobile",
+                "SubscriberName": "John Doe",
+                "ICCID": "89014103211118510720",
+                "CurrentBillingAddress": {
+                  "Street1": "123 N Address Way",
+                  "Street2": "Suite 010",
+                  "City": "Townsville",
+                  "State": "UT",
+                  "Zip": "84048"
+                }
               }
             }
           }
@@ -2374,16 +2379,6 @@
         "summary": "Numbers - Cancel Port In",
         "description": "Cancel an existing port-in request using the order ID. This endpoint allows you to cancel a pending port-in order before it is completed.\n\n**What this does:** Returns the `OrderId` and a `Cancelled` status confirmation. Only pending port-in orders can be cancelled — orders in final states cannot be reversed.\n\n**Next steps:**\n- Submit a new port-in request — `POST /v1.0/numbers/portin`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"OrderId\": \"JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/portin/cancel \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"OrderId\": \"JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Numbers - Cancel Port In",
@@ -2700,6 +2695,9 @@
                     "example": "JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4"
                   }
                 }
+              },
+              "example": {
+                "OrderId": "JNUOID-6e3eb213-baf1-47bb-9db0-5d7d09d4b7b4"
               }
             }
           }
@@ -2714,16 +2712,6 @@
         "summary": "Numbers - Refresh NNID",
         "description": "Refresh the Network Number Identifier (NNID) for a phone number. Use this when a number’s NNID becomes stale or needs to be re-synchronized with the carrier network.\n\n**What this does:** Triggers a re-sync of the number's Network Number Identifier with the carrier network and returns the refreshed `NNID` value. Use this when a number's carrier routing appears stale or incorrect after a number transfer.\n\n**Next steps:**\n- Confirm number state — `GET /v1.0/numbers`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+11234567890\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/refresh-nnid \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+11234567890\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the phone number and refreshed NNID",
@@ -3041,6 +3029,9 @@
                     "example": "+11234567890"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+11234567890"
               }
             }
           }
@@ -3055,16 +3046,6 @@
         "summary": "Get Voicemail Info",
         "description": "Retrieve current voicemail settings and configuration details for a specific phone number, including PIN status, notification email, and account association.\n\n**What this does:** Returns whether voicemail is active on the number, the notification email, subscriber name, and PIN status. Use this to confirm voicemail is configured before troubleshooting missed-call behaviour.\n\n**Next steps:**\n- Activate voicemail — `POST /v1.0/numbers/voicemail/activate`\n- Update settings — `POST /v1.0/numbers/voicemail/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+11234567890\",\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/voicemail/info \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+11234567890\",\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns voicemail configuration for the phone number",
@@ -3389,6 +3370,10 @@
                     "example": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+11234567890",
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -3403,16 +3388,6 @@
         "summary": "Activate Voicemail",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Required:** Provisioned phone number — `POST /v1.0/numbers/provision`\n\n---\n\nActivate voicemail for a phone number. Set a PIN, notification email, and subscriber name. Once activated, unanswered calls to this number will be directed to voicemail.\n\n**What this does:** Enables voicemail on the number and returns a confirmation. Once activated, unanswered calls are captured as voicemail and a notification is sent to the configured email. The PIN is required to retrieve messages.\n\n**Next steps:**\n- Confirm voicemail is active — `POST /v1.0/numbers/voicemail/info`\n- Update settings — `POST /v1.0/numbers/voicemail/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+11234567890\",\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\",\n  \"PIN\": \"1234\",\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"john@example.com\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/voicemail/activate \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+11234567890\",\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\",\n    \"PIN\": \"1234\",\n    \"FirstName\": \"John\",\n    \"LastName\": \"Doe\",\n    \"Email\": \"john@example.com\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns voicemail activation status",
@@ -3755,6 +3730,14 @@
                     "example": "john@example.com"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+11234567890",
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx",
+                "PIN": "1234",
+                "FirstName": "John",
+                "LastName": "Doe",
+                "Email": "john@example.com"
               }
             }
           }
@@ -3769,16 +3752,6 @@
         "summary": "Update Voicemail",
         "description": "Update voicemail settings for a phone number including PIN, notification email, and subscriber name details.\n\n**What this does:** Returns confirmation that the voicemail configuration has been updated. Only the fields you send are changed; omitted fields retain their current values.\n\n**Next steps:**\n- Confirm the update — `POST /v1.0/numbers/voicemail/info`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+11234567890\",\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\",\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"PIN\": \"5678\",\n  \"Email\": \"newemail@example.com\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/voicemail/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+11234567890\",\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\",\n    \"FirstName\": \"John\",\n    \"LastName\": \"Doe\",\n    \"PIN\": \"5678\",\n    \"Email\": \"newemail@example.com\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns update confirmation",
@@ -4121,6 +4094,14 @@
                     "example": "newemail@example.com"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+11234567890",
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx",
+                "FirstName": "John",
+                "LastName": "Doe",
+                "PIN": "5678",
+                "Email": "newemail@example.com"
               }
             }
           }
@@ -4135,16 +4116,6 @@
         "summary": "Delete Voicemail",
         "description": "Remove voicemail configuration from a phone number. After deletion, the number will no longer have voicemail enabled and unanswered calls will not be captured.\n\n**What this does:** Removes voicemail from the number and returns a confirmation. Existing voicemail messages are deleted. Unanswered calls will no longer be captured after this call.\n\n**Next steps:**\n- Reactivate voicemail — `POST /v1.0/numbers/voicemail/activate`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+11234567890\",\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/voicemail/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+11234567890\",\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns voicemail deletion confirmation",
@@ -4467,6 +4438,10 @@
                     "example": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+11234567890",
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -4481,16 +4456,6 @@
         "summary": "Numbers - Port Out",
         "description": "Assign a Port Out PIN to a phone number on your Telegent account. The PIN you set here is the PIN you will be required to provide when you later initiate a port-out transfer to another carrier.\n\n**What this does:** Saves the specified PIN against the phone number so it can be used to authorize a future port-out request.\n\n**Next steps:**\n- Track the port-out order — `GET /v1.0/numbers/order`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PortOutNumber\": \"+11234567890\",\n  \"PortOutPIN\": \"1234\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/portout \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PortOutNumber\": \"+112324567890\",\n    \"PortOutPIN\": \"1234\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Numbers - Port Out",
@@ -4815,6 +4780,10 @@
                     "example": "1234"
                   }
                 }
+              },
+              "example": {
+                "PortOutNumber": "+11234567890",
+                "PortOutPIN": "1234"
               }
             }
           }
@@ -4837,12 +4806,6 @@
               "type": "string"
             },
             "description": "The unique order ID to retrieve details for (e.g., JNUOID-xxxxx)"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/numbers/order?OrderId=JNUOID-10a3g876-....-....-....-c00a36988653' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -5204,12 +5167,6 @@
               "type": "integer",
               "format": "int32"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/numbers/inventory?PageNumber=1' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -5596,12 +5553,6 @@
             }
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/numbers?Number=%2B18018018011' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Number Details",
@@ -5928,16 +5879,6 @@
         "summary": "Numbers Update",
         "description": "Update configuration settings for one or more phone numbers. Modify message routes, voice routes, capabilities, and other number attributes. Changes take effect immediately.\n\n**What this does:** Returns confirmation of the updated number configuration. Changes apply immediately. You can change the message route, voice route, subscriber assignment, or number settings in a single call.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/numbers`\n- Check inventory — `GET /v1.0/numbers/inventory`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"Number\": \"+18018018011\",\n  \"MessageEnabled\": true,\n  \"MessageType\": \"p2p\",\n  \"Classification\": \"MVNO\",\n  \"VoiceEnabled\": true,\n  \"MessageRouteId\": \"MRID-73af1e73-d7b3-4696-bdd9-5b407d9e99ee\",\n  \"VoiceRouteId\": \"CRID-4dec6beb-3985-444b-8c06-8baa5jjvawe\",\n  \"AssignedSubscriberId\": \"TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n  \"Iccid\": \"8901240397190556232\",\n  \"CnamFirstName\": \"Test\",\n  \"CnamLastName\": \"User\",\n  \"ProductType\": \"Data-Only\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"Number\": \"+18018018011\",\n    \"MessageEnabled\": true,\n    \"MessageType\": \"p2p\",\n    \"Classification\": \"MVNO\",\n    \"VoiceEnabled\": true,\n    \"MessageRouteId\": \"MRID-73af1e73-d7b3-4696-bdd9-5b407d9e99ee\",\n    \"VoiceRouteId\": \"CRID-4dec6beb-3985-444b-8c06-8baa5jjvawe\",\n    \"AssignedSubscriberId\": \"TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n    \"Iccid\": \"8901240397190556232\",\n    \"CnamFirstName\": \"Test\",\n    \"CnamLastName\": \"User\",\n    \"ProductType\": \"Data-Only\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Numbers Update",
@@ -6336,6 +6277,20 @@
                     "example": "Data-Only"
                   }
                 }
+              },
+              "example": {
+                "Number": "+18018018011",
+                "MessageEnabled": true,
+                "MessageType": "p2p",
+                "Classification": "MVNO",
+                "VoiceEnabled": true,
+                "MessageRouteId": "MRID-73af1e73-d7b3-4696-bdd9-5b407d9e99ee",
+                "VoiceRouteId": "CRID-4dec6beb-3985-444b-8c06-8baa5jjvawe",
+                "AssignedSubscriberId": "TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d",
+                "Iccid": "8901240397190556232",
+                "CnamFirstName": "Test",
+                "CnamLastName": "User",
+                "ProductType": "Data-Only"
               }
             }
           }
@@ -6350,16 +6305,6 @@
         "summary": "Numbers Status",
         "description": "Check the current status of one or more phone numbers including provisioning state, active services, and any pending changes or issues.\n\n**What this does:** Returns the status result for each number in the batch. Use action codes such as `Cancel`, `Park`, `Swap`, `Replace`, `Swap-Sim`, or `Activate` to change number lifecycle state. Each result includes the number, the action taken, and success or error status.\n\n**Next steps:**\n- Confirm new number state — `GET /v1.0/numbers`\n- View inventory — `GET /v1.0/numbers/inventory`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"StatusChange\": \"replace\",\n  \"EffectiveDate\": \"12/31/2023\",\n  \"AreaCode\": \"201\",\n  \"ZipCode\": \"84043\",\n  \"PhoneNumbers\": [\n    {\n      \"Number\": \"+12016093801\",\n      \"ICCID\": \"202620160938010123\"\n    },\n    {\n      \"Number\": \"+12232233180\",\n      \"ICCID\": \"202620160938010123\"\n    }\n  ]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/status \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"StatusChange\": \"replace\",\n    \"EffectiveDate\": \"12/31/2023\",\n    \"AreaCode\": \"201\",\n    \"ZipCode\": \"84043\",\n    \"PhoneNumbers\": [{\"Number\": \"+12016093801\"}, {\"Number\": \"+12232233180\"}]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Numbers Activate",
@@ -6727,6 +6672,22 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "StatusChange": "replace",
+                "EffectiveDate": "12/31/2023",
+                "AreaCode": "201",
+                "ZipCode": "84043",
+                "PhoneNumbers": [
+                  {
+                    "Number": "+12016093801",
+                    "ICCID": "202620160938010123"
+                  },
+                  {
+                    "Number": "+12232233180",
+                    "ICCID": "202620160938010123"
+                  }
+                ]
               }
             }
           }
@@ -6741,16 +6702,6 @@
         "summary": "Data Usage Limit",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Required:** Provisioned number ID (NID) with `DataEnabled: true` — `POST /v1.0/numbers/provision`\n\n---\n\nSet data usage limits, notification thresholds, and throttling parameters for IoT/MVNO numbers. Configure when subscribers are notified and at what usage level data speeds are throttled. **Important:** NotifyValue, ThrottleValue, and LimitValue must be in ascending increments and cannot be the same value (e.g., NotifyValue < ThrottleValue < LimitValue). Unless a `LimitValue` is specified, the default data limit is **20 MB**.\n\n**What this does:** Returns the updated data usage configuration for each number in the batch. Settings take effect at the next billing cycle or usage event. A `NotifyValue` triggers a notification webhook when usage reaches that threshold; `LimitValue` hard-caps usage; `ThrottleValue` reduces speed instead of cutting off.\n\n**Next steps:**\n- Confirm the new settings — `POST /v1.0/numbers/data-usage/settings`\n- Check current consumption — `POST /v1.0/numbers/data-usage/info`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ValueUnit\": \"MB\",\n  \"NotifyValue\": 10,\n  \"ThrottleValue\": 15,\n  \"ThrottleSpeed\": \"1-mbps\",\n  \"LimitValue\": 20,\n  \"PhoneNumbers\": [\n    { \"Number\": \"+12016093801\" },\n    { \"Number\": \"+12232233180\" }\n  ]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/data-usage \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ValueUnit\": \"MB\",\n    \"NotifyValue\": 10,\n    \"ThrottleValue\": 15,\n    \"ThrottleSpeed\": \"1-mbps\",\n    \"LimitValue\": 20,\n    \"PhoneNumbers\": [\n      { \"Number\": \"+12016093801\" },\n      { \"Number\": \"+12232233180\" }\n    ]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Data Usage Limit Set",
@@ -7125,6 +7076,21 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "ValueUnit": "MB",
+                "NotifyValue": 10,
+                "ThrottleValue": 15,
+                "ThrottleSpeed": "1-mbps",
+                "LimitValue": 20,
+                "PhoneNumbers": [
+                  {
+                    "Number": "+12016093801"
+                  },
+                  {
+                    "Number": "+12232233180"
+                  }
+                ]
               }
             }
           }
@@ -7139,16 +7105,6 @@
         "summary": "Data Usage Settings",
         "description": "Retrieve the current data usage settings (notify value, throttle value, limit value) for one or more phone numbers.\n\n**What this does:** Returns the current `NotifyValue`, `LimitValue`, `ThrottleValue`, `ThrottleSpeed`, and `ValueUnit` for each number. Use this to audit a number's data policy before making changes.\n\n**Next steps:**\n- Update data usage settings — `POST /v1.0/numbers/data-usage`\n- Check current consumption — `POST /v1.0/numbers/data-usage/info`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumbers\": [\n    { \"Number\": \"+17064491796\" }\n  ]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/data-usage/settings \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumbers\": [\n      { \"Number\": \"+17064491796\" }\n    ]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Data Usage Settings Retrieved",
@@ -7485,6 +7441,13 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "PhoneNumbers": [
+                  {
+                    "Number": "+17064491796"
+                  }
+                ]
               }
             }
           }
@@ -7499,16 +7462,6 @@
         "summary": "Data Usage Info",
         "description": "Retrieve real-time data usage information for one or more phone numbers, including amount used, remaining data, and current behavior (active, throttled, etc.).\n\n**What this does:** Returns current consumed data and remaining data for each number in the batch. Values are in the unit specified by `ValueUnit` (MB). Use this for real-time monitoring dashboards or to decide whether to adjust a number's data limit.\n\n**Next steps:**\n- Update data limits — `POST /v1.0/numbers/data-usage`\n- View current limit settings — `POST /v1.0/numbers/data-usage/settings`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumbers\": [\n    { \"Number\": \"+17064491796\" }\n  ]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/data-usage/info \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumbers\": [\n      { \"Number\": \"+17064491796\" }\n    ]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Data Usage Info Retrieved",
@@ -7843,6 +7796,13 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "PhoneNumbers": [
+                  {
+                    "Number": "+17064491796"
+                  }
+                ]
               }
             }
           }
@@ -7857,16 +7817,6 @@
         "summary": "Device Details",
         "description": "Retrieve IoT device details associated with a phone number, including IMEI, device model, device name, and TAC. AccountId is required for Distributors managing multiple accounts.\n\n**What this does:** Returns IoT device metadata linked to the number including IMEI, device type, and network registration status. Use this to confirm a physical device is correctly attached to the SIM/number before troubleshooting connectivity.\n\n**Next steps:**\n- Update the number — `POST /v1.0/numbers/update`\n- Check data usage — `POST /v1.0/numbers/data-usage/info`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+12017540711\",\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/device-details \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PhoneNumber\": \"+12017540711\",\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Device Details Retrieved",
@@ -8195,6 +8145,10 @@
                     "example": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
                   }
                 }
+              },
+              "example": {
+                "PhoneNumber": "+12017540711",
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -8209,16 +8163,6 @@
         "summary": "Create Message Route",
         "description": "Create a new message route to configure how inbound SMS/MMS messages are handled. Specify webhook URLs for message delivery, fallback URLs, and HTTP methods. Each route is identified by a unique MRID (Message Route ID).\n\n**What this does:** Returns the new route's `MessageRouteId` (`MRID-`). Store this ID — it is required when provisioning numbers and can be assigned to multiple numbers. The webhook URL you configure receives a POST for every inbound message on numbers using this route.\n\n**Next steps:**\n- Assign the route to a number at provision time — `POST /v1.0/numbers/provision`\n- Update route settings — `POST /v1.0/message/routes/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"RouteName\": \"Main SMS Webhook\",\n  \"MessageUrl\": \"https://apiendpoint.com\",\n  \"MessageUrlMethod\": \"POST\",\n  \"MessageRouteEnabled\": true,\n  \"MessageAuthenticationType\": \"Basic\",\n  \"MessageUsername\": \"admin\",\n  \"MessagePasswordToken\": \"passwordORbearerToken\",\n  \"CallbackMessageUrl\": \"https://apiendpoint.com\",\n  \"CallbackMessageUrlMethod\": \"POST\",\n  \"CallbackMessageAuthenticationType\": \"Basic\",\n  \"CallbackMessageUsername\": \"admin\",\n  \"CallbackMessagePasswordToken\": \"password\",\n  \"InboundBypass\": true,\n  \"OutboundBypass\": true,\n  \"IntelligentRouteEnabled\": true,\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/message/routes \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"RouteName\": \"Main SMS Webhook\",\n    \"MessageUrl\": \"https://apiendpoint.com\",\n    \"MessageUrlMethod\": \"POST\",\n    \"MessageRouteEnabled\": true,\n    \"MessageAuthenticationType\": \"Basic\",\n    \"MessageUsername\": \"admin\",\n    \"MessagePasswordToken\": \"passwordORbearerToken\",\n    \"CallbackMessageUrl\": \"https://apiendpoint.com\",\n    \"CallbackMessageUrlMethod\": \"POST\",\n    \"CallbackMessageAuthenticationType\": \"Basic\",\n    \"CallbackMessageUsername\": \"admin\",\n    \"CallbackMessagePasswordToken\": \"password\",\n    \"InboundBypass\": true,\n    \"OutboundBypass\": true,\n    \"IntelligentRouteEnabled\": true,\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the newly created Message Route ID (MRID)",
@@ -8645,6 +8589,24 @@
                     "example": "DID-eab92510-1040-45a5-bb9c-0bad927SDY878W"
                   }
                 }
+              },
+              "example": {
+                "RouteName": "Main SMS Webhook",
+                "MessageUrl": "https://apiendpoint.com",
+                "MessageUrlMethod": "POST",
+                "MessageRouteEnabled": true,
+                "MessageAuthenticationType": "Basic",
+                "MessageUsername": "admin",
+                "MessagePasswordToken": "passwordORbearerToken",
+                "CallbackMessageUrl": "https://apiendpoint.com",
+                "CallbackMessageUrlMethod": "POST",
+                "CallbackMessageAuthenticationType": "Basic",
+                "CallbackMessageUsername": "admin",
+                "CallbackMessagePasswordToken": "password",
+                "InboundBypass": true,
+                "OutboundBypass": true,
+                "IntelligentRouteEnabled": true,
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -8673,12 +8635,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/message/routes?MessageRouteId=MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -9003,16 +8959,6 @@
         "summary": "Update Message Route",
         "description": "Update an existing message route's configuration including webhook URLs, HTTP methods, and timeout settings. Changes apply immediately to all numbers using this route.\n\n**What this does:** Returns the updated route configuration. Only the fields you send are changed; omitted fields retain their current values. Changes apply immediately to all numbers using this route — no re-provisioning needed.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/message/routes`\n- View numbers using this route — `GET /v1.0/numbers/inventory`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"MessageRouteId\": \"MRID-01711e7e-c158-4de7-831f-673ab9fdaaa9\",\n  \"RouteName\": \"Main SMS Webhook\",\n  \"MessageUrl\": \"https://apiendpoint.com\",\n  \"MessageUrlMethod\": \"GET\",\n  \"MessageRouteEnabled\": true,\n  \"MessageAuthenticationType\": \"Basic\",\n  \"MessageUsername\": \"admin\",\n  \"MessagePasswordToken\": \"passwordORbearerToken\",\n  \"CallbackMessageUrl\": \"https://apiendpoint.com\",\n  \"CallbackMessageUrlMethod\": \"POST\",\n  \"CallbackMessageAuthenticationType\": null,\n  \"CallbackMessageUsername\": null,\n  \"CallbackMessagePasswordToken\": null,\n  \"InboundBypass\": true,\n  \"OutboundBypass\": true,\n  \"IntelligentRouteEnabled\": true,\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/message/routes/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"MessageRouteId\": \"MRID-01711e7e-c158-4de7-831f-673ab9fdaaa9\",\n    \"RouteName\": \"Main SMS Webhook\",\n    \"MessageUrl\": \"https://apiendpoint.com\",\n    \"MessageUrlMethod\": \"GET\",\n    \"MessageRouteEnabled\": true,\n    \"MessageAuthenticationType\": \"Basic\",\n    \"MessageUsername\": \"admin\",\n    \"MessagePasswordToken\": \"passwordORbearerToken\",\n    \"CallbackMessageUrl\": \"https://apiendpoint.com\",\n    \"CallbackMessageUrlMethod\": \"POST\",\n    \"CallbackMessageAuthenticationType\": null,\n    \"CallbackMessageUsername\": null,\n    \"CallbackMessagePasswordToken\": null,\n    \"InboundBypass\": true,\n    \"OutboundBypass\": true,\n    \"IntelligentRouteEnabled\": true,\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Message Route",
@@ -9438,6 +9384,25 @@
                     "example": "DID-eab92510-1040-45a5-bb9c-0bad927SDY878W"
                   }
                 }
+              },
+              "example": {
+                "MessageRouteId": "MRID-01711e7e-c158-4de7-831f-673ab9fdaaa9",
+                "RouteName": "Main SMS Webhook",
+                "MessageUrl": "https://apiendpoint.com",
+                "MessageUrlMethod": "GET",
+                "MessageRouteEnabled": true,
+                "MessageAuthenticationType": "Basic",
+                "MessageUsername": "admin",
+                "MessagePasswordToken": "passwordORbearerToken",
+                "CallbackMessageUrl": "https://apiendpoint.com",
+                "CallbackMessageUrlMethod": "POST",
+                "CallbackMessageAuthenticationType": null,
+                "CallbackMessageUsername": null,
+                "CallbackMessagePasswordToken": null,
+                "InboundBypass": true,
+                "OutboundBypass": true,
+                "IntelligentRouteEnabled": true,
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -9804,16 +9769,6 @@
         "summary": "Send Outbound Message",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Required:** Provisioned phone number with messaging enabled (`From` field) — `POST /v1.0/numbers/provision`\n\n---\n\nSend an outbound SMS or MMS message from your provisioned phone number. Supports single recipient messaging with optional media attachments for MMS. Returns a message ID for delivery tracking. All phone numbers must be in E.164 format.\n\n**What this does:** Sends an SMS or MMS message immediately and returns a `MessageId` for tracking delivery. The message is routed through the `MessageRouteId` associated with the `From` number. Check delivery status using the MessageId.\n\n**Next steps:**\n- Check message status — `GET /v1.0/message/details`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"CampaignId\": \"JCID-dsuhofh3882\",\n  \"To\": [\n    {\"Number\": \"+18015737111\"},\n    {\"Number\": \"+18014271919\"}\n  ],\n  \"From\": \"+18018018011\",\n  \"Owner\": \"+18018018011\",\n  \"Body\": \"Hello there!!!\",\n  \"MmsMedia\": [\n    {\"MediaUrl\": \"https://results2.com\"},\n    {\"MediaUrl\": \"https://results.com\"}\n  ],\n  \"MmsBase64\": [\n    {\"Base64\": \"dkjjkdflajdfjo3ji3jjljfkjaskjfad\", \"BaseType\": \"audio/wav\"},\n    {\"Base64\": \"dkjjkdflajdfjo3ji3jjljfkjaskjfad\", \"BaseType\": \"video/mpg\"}\n  ]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/message/outbound \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"CampaignId\": \"JCID-dsuhofh3882\",\n    \"To\": [{\"Number\": \"+18015737111\"}, {\"Number\": \"+18014271919\"}],\n    \"From\": \"+18018018011\",\n    \"Owner\": \"+18018018011\",\n    \"Body\": \"Hello there!!!\",\n    \"MmsMedia\": [{\"MediaUrl\": \"https://results2.com\"}, {\"MediaUrl\": \"https://results.com\"}],\n    \"MmsBase64\": [{\"Base64\": \"dkjjkdflajdfjo3ji3jjljfkjaskjfad\", \"BaseType\": \"audio/wav\"}, {\"Base64\": \"dkjjkdflajdfjo3ji3jjljfkjaskjfad\", \"BaseType\": \"video/mpg\"}]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the Message ID (TMID) for delivery tracking",
@@ -10231,6 +10186,38 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "CampaignId": "JCID-dsuhofh3882",
+                "To": [
+                  {
+                    "Number": "+18015737111"
+                  },
+                  {
+                    "Number": "+18014271919"
+                  }
+                ],
+                "From": "+18018018011",
+                "Owner": "+18018018011",
+                "Body": "Hello there!!!",
+                "MmsMedia": [
+                  {
+                    "MediaUrl": "https://results2.com"
+                  },
+                  {
+                    "MediaUrl": "https://results.com"
+                  }
+                ],
+                "MmsBase64": [
+                  {
+                    "Base64": "dkjjkdflajdfjo3ji3jjljfkjaskjfad",
+                    "BaseType": "audio/wav"
+                  },
+                  {
+                    "Base64": "dkjjkdflajdfjo3ji3jjljfkjaskjfad",
+                    "BaseType": "video/mpg"
+                  }
+                ]
               }
             }
           }
@@ -10253,12 +10240,6 @@
               "type": "string"
             },
             "description": "The unique message ID to retrieve details for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/message/details?MessageId=MSG-123456' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -10993,13 +10974,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/message/search?phoneNumber=%2B18015555555' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/message/filter": {
@@ -11036,12 +11011,6 @@
               "type": "integer"
             },
             "description": "Number of results per page"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/message/filter?PhoneNumber=%2B11234567890&Page=1&Results=25' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -11366,16 +11335,6 @@
         "summary": "Delete Message Route",
         "description": "Permanently delete a message route from your account. Phone numbers using this route will need to be reassigned to a different route before deletion. This action cannot be undone.\n\n**What this does:** Returns a confirmation of deletion. Numbers assigned to this route will lose their message routing — reassign them to a different route before deleting to avoid service disruption.\n\n**Next steps:**\n- Create a replacement route — `POST /v1.0/message/routes`\n- Update affected numbers — `POST /v1.0/numbers/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"MessageRouteId\": \"MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/message/routes/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"MessageRouteId\": \"MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Delete Message Route",
@@ -11692,6 +11651,9 @@
                     "example": "MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a"
                   }
                 }
+              },
+              "example": {
+                "MessageRouteId": "MRID-73af1e73-d7b3-4696-bdd9-5b407c96fc8a"
               }
             }
           }
@@ -11706,16 +11668,6 @@
         "summary": "Report Device Delivery",
         "description": "Submit a device-level delivery confirmation for an outbound message. This endpoint is used to record whether a specific message was successfully delivered to the recipient's handset, beyond carrier-level delivery receipts. Provide the MessageId returned from the Send Outbound Message endpoint.\n\n**What this does:** Records a device-level delivery receipt against an existing message. Use this when your application receives an on-device delivery confirmation and wants to update the platform's delivery status record for a message.\n\n**Next steps:**\n- View the updated message status — `GET /v1.0/message/details`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"MessageId\": \"TMID-00348008102307aK01\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/message/device-delivery \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"MessageId\": \"TMID-00348008102307aK01\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Device Delivery",
@@ -12034,6 +11986,9 @@
                     "example": "TMID-00348008102307aK01"
                   }
                 }
+              },
+              "example": {
+                "MessageId": "TMID-00348008102307aK01"
               }
             }
           }
@@ -12048,16 +12003,6 @@
         "summary": "Create Voice Route",
         "description": "Create a new voice route to define how inbound calls are handled for numbers assigned to it. Routes support SIP trunk termination, webhook-based IVR, forwarding, and workgroup distribution. Each route returns a unique CRID (Call Route ID) used when provisioning or updating numbers. Workgroups and Schedules can be attached to a route after creation to enable ring groups and business-hours routing.\n\n**What this does:** Returns the new route's `CallRouteId` (`CRID-`). Store this ID — it is required when provisioning numbers with voice enabled. Configure SIP trunk IPs, forwarding URLs, or workgroups after creation using the update endpoint.\n\n**Next steps:**\n- Assign the route to a number — `POST /v1.0/numbers/provision`\n- Add a workgroup — `POST /v1.0/workgroups`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"RouteName\": \"Main SIP Trunk\",\n  \"RouteType\": \"Trunk\",\n  \"VoiceUrl\": \"https://domain.com\",\n  \"VoiceUrlMethod\": \"POST\",\n  \"VoiceAuthenticationType\": \"Basic\",\n  \"VoiceUsername\": \"admin\",\n  \"VoicePasswordToken\": \"passwordORbearerToken\",\n  \"CallbackVoiceUrl\": \"https://apiendpoint.com\",\n  \"CallbackVoiceUrlMethod\": \"POST\",\n  \"TrunkIp1\": \"20.87.87.87\",\n  \"TrunkIp2\": \"20.87.87.86\",\n  \"TrunkPort1\": \"5061\",\n  \"TrunkPort2\": \"5060\",\n  \"TrunkTransport1\": \"UDP\",\n  \"TrunkTransport2\": \"TCP\",\n  \"TrunkUri1\": \"https://pstn.joonto.com\",\n  \"TrunkUri2\": \"https://pstn2.joonto.com\",\n  \"TrunkEnabled1\": true,\n  \"TrunkEnabled2\": false,\n  \"Trunk1Priortiy\": 10,\n  \"Trunk1Weight\": 10,\n  \"Trunk2Priortiy\": 20,\n  \"Trunk2Weight\": 20,\n  \"HeaderManipulation\": \"HMI8802029\",\n  \"EnableSipRefer\": true,\n  \"TransferCallerId\": \"Transferee/Transferor\",\n  \"SymmetricRtp\": true,\n  \"EnableTrpSecureTrunk\": true,\n  \"EnablePstnTransfer\": true,\n  \"IpWhitelist\": [{\"IpAddress\": \"20.20.10.10\"}, {\"IpAddress\": \"20.20.10.20\"}],\n  \"CnamLookup\": true,\n  \"TerminationUriSubdomain\": \"client\",\n  \"EnableCallStreaming\": true,\n  \"WssUri\": \"wss://192.67.88.2\",\n  \"IntelligentRouteEnabled\": true,\n  \"RouteEnabled\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/voice/routes \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"RouteName\": \"Main SIP Trunk\",\n    \"RouteType\": \"Trunk\",\n    \"VoiceUrl\": \"https://domain.com\",\n    \"VoiceUrlMethod\": \"POST\",\n    \"TrunkIp1\": \"20.87.87.87\",\n    \"TrunkPort1\": \"5061\",\n    \"TrunkTransport1\": \"UDP\",\n    \"RouteEnabled\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the newly created Voice Route ID (CRID)",
@@ -12623,6 +12568,51 @@
                     "example": "DID-1e8939ab-3f3c-4db1-89d7-956d80fd793j"
                   }
                 }
+              },
+              "example": {
+                "RouteName": "Main SIP Trunk",
+                "RouteType": "Trunk",
+                "VoiceUrl": "https://domain.com",
+                "VoiceUrlMethod": "POST",
+                "VoiceAuthenticationType": "Basic",
+                "VoiceUsername": "admin",
+                "VoicePasswordToken": "passwordORbearerToken",
+                "CallbackVoiceUrl": "https://apiendpoint.com",
+                "CallbackVoiceUrlMethod": "POST",
+                "TrunkIp1": "20.87.87.87",
+                "TrunkIp2": "20.87.87.86",
+                "TrunkPort1": "5061",
+                "TrunkPort2": "5060",
+                "TrunkTransport1": "UDP",
+                "TrunkTransport2": "TCP",
+                "TrunkUri1": "https://pstn.joonto.com",
+                "TrunkUri2": "https://pstn2.joonto.com",
+                "TrunkEnabled1": true,
+                "TrunkEnabled2": false,
+                "Trunk1Priortiy": 10,
+                "Trunk1Weight": 10,
+                "Trunk2Priortiy": 20,
+                "Trunk2Weight": 20,
+                "HeaderManipulation": "HMI8802029",
+                "EnableSipRefer": true,
+                "TransferCallerId": "Transferee/Transferor",
+                "SymmetricRtp": true,
+                "EnableTrpSecureTrunk": true,
+                "EnablePstnTransfer": true,
+                "IpWhitelist": [
+                  {
+                    "IpAddress": "20.20.10.10"
+                  },
+                  {
+                    "IpAddress": "20.20.10.20"
+                  }
+                ],
+                "CnamLookup": true,
+                "TerminationUriSubdomain": "client",
+                "EnableCallStreaming": true,
+                "WssUri": "wss://192.67.88.2",
+                "IntelligentRouteEnabled": true,
+                "RouteEnabled": true
               }
             }
           }
@@ -12643,12 +12633,6 @@
               "type": "string"
             },
             "description": "The unique voice route ID (e.g., CRID-xxxxx)"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/voice/routes?CallRouteID=CRID-509de94f-79cc-429b-a317-2102654dabbb' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -12990,16 +12974,6 @@
         "summary": "Update Voice Route",
         "description": "Update an existing voice route's configuration including SIP trunk settings, forwarding numbers, IVR menus, and workgroup assignments. Changes apply immediately to all numbers using this route.\n\n**What this does:** Returns the updated route configuration. Only fields you send are changed. Changes apply immediately to all numbers using this route.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/voice/routes`\n- View numbers using this route — `GET /v1.0/numbers/inventory`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"CallRouteId\": \"CRID-509de94f-79cc-429b-a317-2102654dabbb\",\n  \"RouteName\": \"Main SIP Trunk\",\n  \"RouteType\": \"Trunk\",\n  \"VoiceUrl\": \"https://domain.com\",\n  \"VoiceUrlMethod\": \"GET\",\n  \"VoiceAuthenticationType\": \"Basic\",\n  \"VoiceUsername\": \"admin\",\n  \"VoicePasswordToken\": \"passwordORbearerToken\",\n  \"CallbackVoiceUrl\": \"https://apiendpoint.com\",\n  \"CallbackVoiceUrlMethod\": \"POST\",\n  \"TrunkIp1\": \"20.87.87.87\",\n  \"TrunkIp2\": \"20.87.87.86\",\n  \"TrunkPort1\": \"5061\",\n  \"TrunkPort2\": \"5060\",\n  \"TrunkTransport1\": \"UDP\",\n  \"TrunkTransport2\": \"TCP\",\n  \"TrunkUri1\": \"https://pstn.joonto.com\",\n  \"TrunkUri2\": \"https://pstn2.joonto.com\",\n  \"TrunkEnabled1\": true,\n  \"TrunkEnabled2\": false,\n  \"Trunk1Priortiy\": 10,\n  \"Trunk1Weight\": 10,\n  \"Trunk2Priortiy\": 20,\n  \"Trunk2Weight\": 20,\n  \"HeaderManipulation\": \"HMI8802029\",\n  \"EnableSipRefer\": true,\n  \"TransferCallerId\": \"Transferee/Transferor\",\n  \"SymmetricRtp\": true,\n  \"EnableTrpSecureTrunk\": true,\n  \"EnablePstnTransfer\": true,\n  \"IpWhitelist\": [{\"IpAddress\": \"20.20.10.10\"}, {\"IpAddress\": \"20.20.10.20\"}],\n  \"CnamLookup\": true,\n  \"TerminationUriSubdomain\": \"client\",\n  \"EnableCallStreaming\": true,\n  \"WssUri\": \"wss://192.67.88.2\",\n  \"IntelligentRouteEnabled\": true,\n  \"RouteEnabled\": true,\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/voice/routes/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"CallRouteId\": \"CRID-509de94f-79cc-429b-a317-2102654dabbb\",\n    \"RouteName\": \"Main SIP Trunk\",\n    \"RouteType\": \"Trunk\",\n    \"VoiceUrl\": \"https://domain.com\",\n    \"VoiceUrlMethod\": \"GET\",\n    \"TrunkIp1\": \"20.87.87.87\",\n    \"TrunkPort1\": \"5061\",\n    \"RouteEnabled\": true,\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Voice Route",
@@ -13568,6 +13542,53 @@
                     "example": true
                   }
                 }
+              },
+              "example": {
+                "CallRouteId": "CRID-509de94f-79cc-429b-a317-2102654dabbb",
+                "RouteName": "Main SIP Trunk",
+                "RouteType": "Trunk",
+                "VoiceUrl": "https://domain.com",
+                "VoiceUrlMethod": "GET",
+                "VoiceAuthenticationType": "Basic",
+                "VoiceUsername": "admin",
+                "VoicePasswordToken": "passwordORbearerToken",
+                "CallbackVoiceUrl": "https://apiendpoint.com",
+                "CallbackVoiceUrlMethod": "POST",
+                "TrunkIp1": "20.87.87.87",
+                "TrunkIp2": "20.87.87.86",
+                "TrunkPort1": "5061",
+                "TrunkPort2": "5060",
+                "TrunkTransport1": "UDP",
+                "TrunkTransport2": "TCP",
+                "TrunkUri1": "https://pstn.joonto.com",
+                "TrunkUri2": "https://pstn2.joonto.com",
+                "TrunkEnabled1": true,
+                "TrunkEnabled2": false,
+                "Trunk1Priortiy": 10,
+                "Trunk1Weight": 10,
+                "Trunk2Priortiy": 20,
+                "Trunk2Weight": 20,
+                "HeaderManipulation": "HMI8802029",
+                "EnableSipRefer": true,
+                "TransferCallerId": "Transferee/Transferor",
+                "SymmetricRtp": true,
+                "EnableTrpSecureTrunk": true,
+                "EnablePstnTransfer": true,
+                "IpWhitelist": [
+                  {
+                    "IpAddress": "20.20.10.10"
+                  },
+                  {
+                    "IpAddress": "20.20.10.20"
+                  }
+                ],
+                "CnamLookup": true,
+                "TerminationUriSubdomain": "client",
+                "EnableCallStreaming": true,
+                "WssUri": "wss://192.67.88.2",
+                "IntelligentRouteEnabled": true,
+                "RouteEnabled": true,
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -13985,16 +14006,6 @@
         "summary": "Delete Voice Route",
         "description": "Permanently delete a voice route from your account. Phone numbers using this route will need to be reassigned to a different route before deletion. This action cannot be undone.\n\n**What this does:** Returns a deletion confirmation. Numbers assigned to this route will lose voice routing — reassign them to a different route before deleting to avoid service disruption.\n\n**Next steps:**\n- Create a replacement route — `POST /v1.0/voice/routes`\n- Update affected numbers — `POST /v1.0/numbers/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"CallRouteId\": \"CRID-4dec6beb-3985-444b-8c06-8baa70dc1416\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/voice/routes/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"CallRouteId\": \"CRID-4dec6beb-3985-444b-8c06-8baa70dc1416\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Delete Voice Route",
@@ -14311,6 +14322,9 @@
                     "example": "CRID-4dec6beb-3985-444b-8c06-8baa70dc1416"
                   }
                 }
+              },
+              "example": {
+                "CallRouteId": "CRID-4dec6beb-3985-444b-8c06-8baa70dc1416"
               }
             }
           }
@@ -14644,13 +14658,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account/services' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/account/products": {
@@ -14997,13 +15005,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account/products' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/account/packages": {
@@ -15348,13 +15350,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account/packages' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/account/subscriptions": {
@@ -15686,13 +15682,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account/subscriptions' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/account/workgroups": {
@@ -15703,12 +15693,6 @@
         "summary": "Get Account's Workgroups",
         "description": "Retrieve all workgroups associated with the authenticated account. Returns a list of workgroups with their IDs, names, and configuration status.\n\n**What this does:** Returns a list of workgroups configured on the account including their IDs, names, types, and active status. Use this to look up a `WG-` ID before attaching it to a voice route or schedule.\n\n**Next steps:**\n- Get full workgroup details — `GET /v1.0/workgroups`\n- Create a workgroup — `POST /v1.0/workgroups`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account/workgroups' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns a list of workgroups for the account",
@@ -16035,12 +16019,6 @@
             "description": "The unique service ID to retrieve details for"
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/services?ServiceId=SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Service-Details",
@@ -16352,16 +16330,6 @@
         "summary": "Create Service",
         "description": "Create a new service with a name, cost, and billing frequency. Services can be added to packages and assigned to subscribers.\n\n**What this does:** Returns the new service's `ServiceId` (`SID-`) and full record. Services are the billable unit; add pricing tiers using the service items endpoints, then associate the service with products.\n\n**Next steps:**\n- Add a pricing item — `POST /v1.0/services/items/add`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ServiceName\": \"Caller Id\",\n  \"Cost\": 1.23,\n  \"Monthly\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/services \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ServiceName\": \"Caller Id\",\n    \"Cost\": 1.23,\n    \"Monthly\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Create Service",
@@ -16716,16 +16684,6 @@
         "summary": "Update Service",
         "description": "Update an existing service's name, cost, or billing cycle. Changes take effect immediately and are reflected across all packages and subscriptions that include this service. Use the ServiceId returned when the service was created.\n\n**What this does:** Returns the updated service record. Only fields you send are changed; omitted fields retain their current values.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/services`\n- View service items — `GET /v1.0/services/items`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ServiceId\": \"SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b\",\n  \"ServiceName\": \"Caller Id\",\n  \"Cost\": 2.34,\n  \"Monthly\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/services/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ServiceId\": \"SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b\",\n    \"ServiceName\": \"Caller Id\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Service"
@@ -17039,6 +16997,12 @@
                     "example": true
                   }
                 }
+              },
+              "example": {
+                "ServiceId": "SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b",
+                "ServiceName": "Caller Id",
+                "Cost": 2.34,
+                "Monthly": true
               }
             }
           }
@@ -17053,16 +17017,6 @@
         "summary": "Delete Service",
         "description": "Permanently delete a service by its ServiceId. This action cannot be undone.\n\n**What this does:** Returns a deletion confirmation. Deleting a service removes it from the platform permanently — ensure it is not referenced in any active products or packages before deleting.\n\n**Next steps:**\n- View all services — `GET /v1.0/services`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ServiceId\": \"SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/services/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ServiceId\": \"SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Service"
@@ -17364,6 +17318,9 @@
                     "example": "SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b"
                   }
                 }
+              },
+              "example": {
+                "ServiceId": "SID-65d007be-8b49-45ac-b8ae-77b8d6a66c8b"
               }
             }
           }
@@ -17386,12 +17343,6 @@
               "type": "string"
             },
             "description": "The service ID to retrieve items for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/services/items?ServiceId=SID-abc123' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -17710,16 +17661,6 @@
         "summary": "Add Service Item",
         "description": "Add a new pricing item or component to an existing service. Service items define the cost and billing frequency (monthly or one-time) for the service at a specific distributor or aggregator level.\n\n**What this does:** Returns a confirmation for the new item. Service items define the price and billing frequency for a service at a specific distributor or aggregator scope. Multiple items can exist on a single service for different pricing tiers.\n\n**Next steps:**\n- View all items on the service — `GET /v1.0/services/items`\n- Update an item — `POST /v1.0/services/items/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ServiceId\": \"SID-abc123\",\n  \"DistributorId\": \"DID-abc123\",\n  \"Price\": 9.99,\n  \"Monthly\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/services/items/add \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ServiceId\": \"SID-abc123\",\n    \"DistributorId\": \"DID-abc123\",\n    \"Price\": 9.99,\n    \"Monthly\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the created service item",
@@ -18058,6 +17999,12 @@
                     "example": true
                   }
                 }
+              },
+              "example": {
+                "ServiceId": "SID-abc123",
+                "DistributorId": "DID-abc123",
+                "Price": 9.99,
+                "Monthly": true
               }
             }
           }
@@ -18072,16 +18019,6 @@
         "summary": "Update Service Item",
         "description": "Update an existing service item's pricing or billing configuration.\n\n**What this does:** Returns the updated service item record. Only the fields you send are changed. Pricing changes apply at the next billing cycle for active subscriptions using this service.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/services/items`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ServiceId\": \"SID-abc123\",\n  \"Price\": 14.99,\n  \"Monthly\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/services/items/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ServiceId\": \"SID-abc123\",\n    \"Price\": 14.99,\n    \"Monthly\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the updated service item",
@@ -18419,6 +18356,11 @@
                     "example": true
                   }
                 }
+              },
+              "example": {
+                "ServiceId": "SID-abc123",
+                "Price": 14.99,
+                "Monthly": true
               }
             }
           }
@@ -18433,16 +18375,6 @@
         "summary": "Delete Service Item",
         "description": "Remove a service item from a service.\n\n**What this does:** Returns a deletion confirmation. Removes the pricing tier from the service. Ensure no active subscriptions depend on this item before deleting.\n\n**Next steps:**\n- View remaining items — `GET /v1.0/services/items`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ServiceId\": \"SID-abc123\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/services/items/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ServiceId\": \"SID-abc123\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns deletion confirmation",
@@ -18758,6 +18690,9 @@
                     "example": "SID-abc123"
                   }
                 }
+              },
+              "example": {
+                "ServiceId": "SID-abc123"
               }
             }
           }
@@ -18772,16 +18707,6 @@
         "summary": "Update SIM Status",
         "description": "Update the status of a SIM card using its ICCID. Use this to activate, suspend, or change the state of a physical or eSIM card in the network.\n\n**What this does:** Returns the updated SIM `SimStatus` and a success confirmation. Valid statuses are `Active`, `Suspended`, and `Empty`. Use `Active` to enable the SIM, `Suspended` to temporarily disable it while retaining the number association, or `Empty` to clear all associations.\n\n**Next steps:**\n- Confirm the change — `GET /v1.0/numbers`\n- Clear all SIM associations — `POST /v1.0/sims/clear-status`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ICCID\": \"8901240397190195850\",\n  \"MSISDN\": \"+11234567890\",\n  \"SimStatus\": \"Active\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/sims/update-status \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ICCID\": \"8901240397190195850\",\n    \"MSISDN\": \"+11234567890\",\n    \"SimStatus\": \"Active\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the updated SIM status",
@@ -19114,6 +19039,11 @@
                     "example": "Active"
                   }
                 }
+              },
+              "example": {
+                "ICCID": "8901240397190195850",
+                "MSISDN": "+11234567890",
+                "SimStatus": "Active"
               }
             }
           }
@@ -19128,16 +19058,6 @@
         "summary": "Clear SIM Status",
         "description": "Reset a SIM card's status to Empty, effectively unassigning it from any active number or subscriber. Useful when decommissioning a SIM before reassigning it.\n\n**What this does:** Returns the ICCID with a status of `Empty` and a success confirmation. After clearing, the SIM is unassigned and ready to be re-provisioned or reassigned to a different number.\n\n**Next steps:**\n- Re-provision the SIM — `POST /v1.0/numbers/provision`\n- Assign a new status — `POST /v1.0/sims/update-status`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ICCID\": \"8901240397190195850\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/sims/clear-status \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ICCID\": \"8901240397190195850\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the SIM with Empty status",
@@ -19455,6 +19375,9 @@
                     "example": "8901240397190195850"
                   }
                 }
+              },
+              "example": {
+                "ICCID": "8901240397190195850"
               }
             }
           }
@@ -19477,12 +19400,6 @@
               "type": "string"
             },
             "description": "The unique product ID to retrieve details for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/products?ProductId=PRID-d9e74d70-3ca8-40f3-a415' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -19801,16 +19718,6 @@
         "summary": "Create Product",
         "description": "Create a new product with SKU, description, type, cost, and billing frequency. Products can be bundled into packages for subscriber offerings.\n\n**What this does:** Returns the new product's `ProductId` (`PRID-`) and full record. Once created, add it to packages using the package items endpoints.\n\n**Next steps:**\n- Add the product to a package — `POST /v1.0/packages/items/add`\n- Create a service — `POST /v1.0/services`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SKU\": \"eSim\",\n  \"Description\": \"Telegent eSim\",\n  \"Type\": \"esim\",\n  \"SubType\": \"esim\",\n  \"Cost\": 12.34,\n  \"BillingFrequency\": \"MRC\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/products \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SKU\": \"eSim\",\n    \"Description\": \"Telegent eSim\",\n    \"Type\": \"esim\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Create Product",
@@ -20168,6 +20075,14 @@
                     "example": "MRC"
                   }
                 }
+              },
+              "example": {
+                "SKU": "eSim",
+                "Description": "Telegent eSim",
+                "Type": "esim",
+                "SubType": "esim",
+                "Cost": 12.34,
+                "BillingFrequency": "MRC"
               }
             }
           }
@@ -20182,16 +20097,6 @@
         "summary": "Update Product",
         "description": "Update an existing product's SKU, description, type, cost, or billing cycle. Changes apply immediately and are reflected across all packages that include this product. Use the ProductId (PID-) returned when the product was created.\n\n**What this does:** Returns the updated product record. Only fields you send are changed. Changes affect all packages that include this product at their next billing cycle.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/products`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ProductId\": \"PRID-d9e74d70-3ca8-40f3-a415\",\n  \"SKU\": \"eSim\",\n  \"Description\": \"Telegent eSim\",\n  \"Type\": \"esim\",\n  \"SubType\": \"esim\",\n  \"Cost\": 12.34,\n  \"BillingFrequency\": \"MRC\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/products/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ProductId\": \"PRID-d9e74d70-3ca8-40f3-a415\",\n    \"SKU\": \"eSim\",\n    \"Description\": \"Telegent eSim\",\n    \"Type\": \"esim\",\n    \"SubType\": \"esim\",\n    \"Cost\": 12.34,\n    \"BillingFrequency\": \"MRC\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Product",
@@ -20541,6 +20446,15 @@
                     "example": "MRC"
                   }
                 }
+              },
+              "example": {
+                "ProductId": "PRID-d9e74d70-3ca8-40f3-a415",
+                "SKU": "eSim",
+                "Description": "Telegent eSim",
+                "Type": "esim",
+                "SubType": "esim",
+                "Cost": 12.34,
+                "BillingFrequency": "MRC"
               }
             }
           }
@@ -20555,16 +20469,6 @@
         "summary": "Delete Product",
         "description": "Permanently delete a product by its ProductId. This action cannot be undone.\n\n**What this does:** Returns a deletion confirmation. Products included in active packages cannot be deleted — remove them from all packages first.\n\n**Next steps:**\n- Remove from a package — `POST /v1.0/packages/items/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ProductId\": \"PRID-d9e74d70-3ca8-40f3-a415-e1194b0f8936\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/products/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ProductId\": \"PRID-d9e74d70-3ca8-40f3-a415-e1194b0f8936\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Delete Product",
@@ -20881,6 +20785,9 @@
                     "example": "PRID-d9e74d70-3ca8-40f3-a415-e1194b0f8936"
                   }
                 }
+              },
+              "example": {
+                "ProductId": "PRID-d9e74d70-3ca8-40f3-a415-e1194b0f8936"
               }
             }
           }
@@ -20903,12 +20810,6 @@
               "type": "string"
             },
             "description": "The unique package ID to retrieve details for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/packages?PackageId=PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -21226,16 +21127,6 @@
         "summary": "Create Package",
         "description": "Create a new package with name, description, type, price, and billing frequency. Packages bundle products together for subscriber offerings.\n\n**What this does:** Returns the new package's `PackageId` (`PID-`) and full record. Store the `PID-` — it is required when creating subscriptions. Add products to the package using the items endpoints.\n\n**Next steps:**\n- Add items to the package — `POST /v1.0/packages/items/add`\n- Create a subscription — `POST /v1.0/subscriptions`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PackageName\": \"Package 10\",\n  \"Description\": \"Package 10 Description\",\n  \"SubscriberId\": \"TSUID-A2AD6FB7-2D53-40CE-96E4-EBB7F7C54509\",\n  \"Type\": \"sip\",\n  \"Price\": 300.0,\n  \"Monthly\": true,\n  \"PackageItems\": [\n    {\n      \"ProductId\": \"PRID-d869bdbf-895e-44fe-986b-1fabce90b994\",\n      \"Price\": \"1.12\",\n      \"Monthly\": false,\n      \"Type\": \"Type 3\"\n    },\n    {\n      \"ProductId\": \"PRID-d869bdbf-895e-44fe-986b-1fabce90b994\",\n      \"Price\": \"1.12\",\n      \"Monthly\": false,\n      \"Type\": \"Type 3\"\n    },\n    {\n      \"ProductId\": \"PRID-d869bdbf-895e-44fe-986b-1fabce90b994\",\n      \"Price\": \"1.12\",\n      \"Monthly\": false,\n      \"Type\": \"Type 3\"\n    }\n  ]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/packages \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PackageName\": \"Package 10\",\n    \"Description\": \"Package 10 Description\",\n    \"SubscriberId\": \"TSUID-A2AD6FB7-2D53-40CE-96E4-EBB7F7C54509\",\n    \"Type\": \"sip\",\n    \"Price\": 300.0,\n    \"Monthly\": true,\n    \"PackageItems\": [{\"ProductId\": \"PRID-d869bdbf-895e-44fe-986b-1fabce90b994\", \"Price\": \"1.12\", \"Monthly\": false, \"Type\": \"Type 3\"}]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Create Package",
@@ -21612,6 +21503,34 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "PackageName": "Package 10",
+                "Description": "Package 10 Description",
+                "SubscriberId": "TSUID-A2AD6FB7-2D53-40CE-96E4-EBB7F7C54509",
+                "Type": "sip",
+                "Price": 300.0,
+                "Monthly": true,
+                "PackageItems": [
+                  {
+                    "ProductId": "PRID-d869bdbf-895e-44fe-986b-1fabce90b994",
+                    "Price": "1.12",
+                    "Monthly": false,
+                    "Type": "Type 3"
+                  },
+                  {
+                    "ProductId": "PRID-d869bdbf-895e-44fe-986b-1fabce90b994",
+                    "Price": "1.12",
+                    "Monthly": false,
+                    "Type": "Type 3"
+                  },
+                  {
+                    "ProductId": "PRID-d869bdbf-895e-44fe-986b-1fabce90b994",
+                    "Price": "1.12",
+                    "Monthly": false,
+                    "Type": "Type 3"
+                  }
+                ]
               }
             }
           }
@@ -21953,13 +21872,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/packages/subscriptions?PackageId=PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/packages/update": {
@@ -21970,16 +21883,6 @@
         "summary": "Update Package",
         "description": "Update an existing package's name, description, type, price, or billing cycle. Changes apply immediately and affect all active subscriptions tied to this package. Use the PackageId (PID-) returned when the package was created.\n\n**What this does:** Returns the updated package record. Changes apply to the package definition immediately but do not retroactively change active subscriptions.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/packages`\n- View package subscriptions — `GET /v1.0/packages/subscriptions`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PackageId\": \"PID-a56cf783-c249-42fa-bf52-529e5886cdd4\",\n  \"PackageName\": \"Package 10\",\n  \"Description\": \"Package 10 Description\",\n  \"SubscriberId\": \"TSUID-A2AD6FB7-2D53-40CE-96E4-EBB7F7C54509\",\n  \"Type\": \"sip\",\n  \"Price\": 300.0,\n  \"Monthly\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/packages/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PackageId\": \"PID-a56cf783-c249-42fa-bf52-529e5886cdd4\",\n    \"PackageName\": \"Package 10\",\n    \"Description\": \"Package 10 Description\",\n    \"SubscriberId\": \"TSUID-A2AD6FB7-2D53-40CE-96E4-EBB7F7C54509\",\n    \"Type\": \"sip\",\n    \"Price\": 300.0,\n    \"Monthly\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Package",
@@ -22327,6 +22230,15 @@
                     "example": true
                   }
                 }
+              },
+              "example": {
+                "PackageId": "PID-a56cf783-c249-42fa-bf52-529e5886cdd4",
+                "PackageName": "Package 10",
+                "Description": "Package 10 Description",
+                "SubscriberId": "TSUID-A2AD6FB7-2D53-40CE-96E4-EBB7F7C54509",
+                "Type": "sip",
+                "Price": 300.0,
+                "Monthly": true
               }
             }
           }
@@ -22341,16 +22253,6 @@
         "summary": "Delete Package",
         "description": "Permanently delete a package by its PackageId. This action cannot be undone.\n\n**What this does:** Returns a deletion confirmation. Packages with active subscriptions cannot be deleted — cancel all subscriptions first.\n\n**Next steps:**\n- View current subscriptions — `GET /v1.0/packages/subscriptions`\n- Delete individual subscriptions — `POST /v1.0/subscriptions/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PackageId\": \"PID-a56cf783-c249-42fa-bf52-529e5886cdd4\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/packages/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PackageId\": \"PID-a56cf783-c249-42fa-bf52-529e5886cdd4\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Delete Package",
@@ -22667,6 +22569,9 @@
                     "example": "PID-a56cf783-c249-42fa-bf52-529e5886cdd4"
                   }
                 }
+              },
+              "example": {
+                "PackageId": "PID-a56cf783-c249-42fa-bf52-529e5886cdd4"
               }
             }
           }
@@ -23010,13 +22915,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/packages/items?PackageId=PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/packages/items/add": {
@@ -23027,16 +22926,6 @@
         "summary": "Add Package Item",
         "description": "Add a product to an existing package. Specify the package, product, price, and billing frequency for the item.\n\n**What this does:** Returns the new package item ID and confirmation. Adding an item to a package makes that product available to all subscribers with an active subscription to this package.\n\n**Next steps:**\n- View all items in the package — `GET /v1.0/packages/items`\n- Remove an item — `POST /v1.0/packages/items/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n  \"ProductId\": \"PRID-d9e74d70-3ca8-40f3-a415\",\n  \"Price\": \"1.12\",\n  \"Monthly\": false,\n  \"Type\": \"Type 3\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/packages/items/add \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n    \"ProductId\": \"PRID-d9e74d70-3ca8-40f3-a415\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Add Package Item",
@@ -23378,6 +23267,13 @@
                     "example": "Type 3"
                   }
                 }
+              },
+              "example": {
+                "PackageId": "PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db",
+                "ProductId": "PRID-d9e74d70-3ca8-40f3-a415",
+                "Price": "1.12",
+                "Monthly": false,
+                "Type": "Type 3"
               }
             }
           }
@@ -23392,16 +23288,6 @@
         "summary": "Update Package Item",
         "description": "Update an existing item within a package. Modify price, type, or billing frequency for the package item.\n\n**What this does:** Returns the updated package item record. Use this to adjust pricing or billing frequency for a product within a specific package without affecting the product definition itself.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/packages/items`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n  \"PackageItemId\": \"PIID-a102d17b-09a9-4096-a597-e48c055d8d6d\",\n  \"Price\": \"1.12\",\n  \"Monthly\": false,\n  \"Type\": \"mvno\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/packages/items/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n    \"PackageItemId\": \"PIID-a102d17b-09a9-4096-a597-e48c055d8d6d\",\n    \"Price\": \"1.12\",\n    \"Monthly\": false,\n    \"Type\": \"mvno\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Package Item",
@@ -23743,6 +23629,13 @@
                     "example": "mvno"
                   }
                 }
+              },
+              "example": {
+                "PackageId": "PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db",
+                "PackageItemId": "PIID-a102d17b-09a9-4096-a597-e48c055d8d6d",
+                "Price": "1.12",
+                "Monthly": false,
+                "Type": "mvno"
               }
             }
           }
@@ -23757,16 +23650,6 @@
         "summary": "Delete Package Item",
         "description": "Remove an item from a package. This removes the product association from the package but does not delete the product itself.\n\n**What this does:** Returns a deletion confirmation. Removing an item from a package removes that product from the package's service bundle. Active subscriptions to this package lose access to the product going forward.\n\n**Next steps:**\n- View remaining items — `GET /v1.0/packages/items`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PackageId\": \"PID-d869bdbf-895e-44fe-986b-1fabce90b994\",\n  \"PackageItemId\": \"PIID-eee3dd72-03ce-40f0-a80d-5bcadedda1d9\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/packages/items/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"PackageId\": \"PID-d869bdbf-895e-44fe-986b-1fabce90b994\",\n    \"PackageItemId\": \"PIID-eee3dd72-03ce-40f0-a80d-5bcadedda1d9\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Delete Package Item",
@@ -24090,6 +23973,10 @@
                     "example": "PIID-eee3dd72-03ce-40f0-a80d-5bcadedda1d9"
                   }
                 }
+              },
+              "example": {
+                "PackageId": "PID-d869bdbf-895e-44fe-986b-1fabce90b994",
+                "PackageItemId": "PIID-eee3dd72-03ce-40f0-a80d-5bcadedda1d9"
               }
             }
           }
@@ -24112,12 +23999,6 @@
               "type": "string"
             },
             "description": "The unique subscription ID to retrieve details for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscriptions?SubscriptionId=SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -24442,16 +24323,6 @@
               "type": "string"
             },
             "description": ""
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n  \"TNID\": \"NID-B5B67F02-708A-1851-20DF-61FC1919C4F6\",\n  \"ICCID\": \"8901240397190002080\",\n  \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n  \"Type\": \"mvno\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscriptions \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n    \"TNID\": \"NID-B5B67F02-708A-1851-20DF-61FC1919C4F6\",\n    \"ICCID\": \"8901240397190002080\",\n    \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n    \"Type\": \"mvno\"\n  }'"
           }
         ],
         "responses": {
@@ -24797,6 +24668,13 @@
                     "example": "mvno"
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d",
+                "TNID": "NID-B5B67F02-708A-1851-20DF-61FC1919C4F6",
+                "ICCID": "8901240397190002080",
+                "PackageId": "PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db",
+                "Type": "mvno"
               }
             }
           }
@@ -24812,16 +24690,6 @@
         "summary": "Update Subscription",
         "description": "Update an existing subscription's information including subscriber, package, phone number, or SIM card associations.\n\n**What this does:** Returns the updated subscription record. Only fields you send are changed; omitted fields retain their current values. Use this to swap a subscriber's package or update the associated phone number.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/subscriptions`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriptionId\": \"SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c\",\n  \"SubscriberId\": \"SID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n  \"TNID\": \"NID-B5B67F02-708A-1851-20DF-61FC1919C4F6\",\n  \"ICCID\": \"8901240397190002080\",\n  \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n  \"Type\": \"mvno\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscriptions/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriptionId\": \"SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c\",\n    \"SubscriberId\": \"SID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n    \"TNID\": \"NID-B5B67F02-708A-1851-20DF-61FC1919C4F6\",\n    \"ICCID\": \"8901240397190002080\",\n    \"PackageId\": \"PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db\",\n    \"Type\": \"mvno\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Update Subscription",
@@ -25163,6 +25031,14 @@
                     "example": "mvno"
                   }
                 }
+              },
+              "example": {
+                "SubscriptionId": "SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c",
+                "SubscriberId": "SID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d",
+                "TNID": "NID-B5B67F02-708A-1851-20DF-61FC1919C4F6",
+                "ICCID": "8901240397190002080",
+                "PackageId": "PID-9a8435dc-ca6e-4a98-b761-5e6dc04447db",
+                "Type": "mvno"
               }
             }
           }
@@ -25178,16 +25054,6 @@
         "summary": "Delete Subscription",
         "description": "Permanently delete a subscription by its SubscriptionId. This removes the subscriber's access to the associated package.\n\n**What this does:** Returns a deletion confirmation. Deleting a subscription removes the subscriber's access to the associated package and its services. The subscriber and phone number are not deleted.\n\n**Next steps:**\n- Create a new subscription — `POST /v1.0/subscriptions`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriptionId\": \"SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscriptions/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriptionId\": \"SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Delete Subscription",
@@ -25504,6 +25370,9 @@
                     "example": "SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c"
                   }
                 }
+              },
+              "example": {
+                "SubscriptionId": "SUB-ef84c0b5-d750-4a5a-99b1-4705089cd20c"
               }
             }
           }
@@ -25519,12 +25388,6 @@
         "summary": "Get Accounts",
         "description": "Retrieve a list of all accounts associated with the distributor. Returns account information including name, total subscribers, and address details.\n\n**What this does:** Returns a list of all accounts under this distributor including their `AID-` IDs, names, and status. Use this to enumerate accounts before making account-specific calls.\n\n**Next steps:**\n- Get account details — `GET /v1.0/account`\n- Create an account — `POST /v1.0/account/create`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET https://api.telegent.com/v1.0/distributor/accounts \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Accounts Retrieved",
@@ -25873,12 +25736,6 @@
             "description": "Number of subscribers per page"
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/distributor/subscribers?PageNumber=1&TotalPerPage=10' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Subscribers Retrieved",
@@ -26212,12 +26069,6 @@
             "description": "Distributor ID to retrieve details for"
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/distributor?DistributorId=DID-1e24785ab-3f3c-7db1-89d7-956d80fdnn5' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Distributor Details Retrieved",
@@ -26547,16 +26398,6 @@
         "summary": "Create Distributor",
         "description": "Create a new distributor with billing and mailing address information. Returns the newly created distributor details including account key and secret.\n\n**What this does:** Returns the new distributor's `DistributorId` (`DID-`) and created record. The `DID-` is the root identifier for all accounts, packages, and products under this distributor.\n\n**Next steps:**\n- Create an account under this distributor — `POST /v1.0/account/create`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"DistributorName\": \"Telegent Distributor 2\",\n  \"BillingAddress\": {\n    \"Street1\": \"\",\n    \"Street2\": \"\",\n    \"City\": \"\",\n    \"State\": \"\",\n    \"Zip\": \"\",\n    \"Country\": \"\"\n  },\n  \"MailingAddress\": {\n    \"Street1\": \"\",\n    \"Street2\": \"\",\n    \"City\": \"\",\n    \"State\": \"\",\n    \"Zip\": \"\",\n    \"Country\": \"\"\n  }\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/distributor/create \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"DistributorName\": \"Telegent Distributor 2\",\n    \"BillingAddress\": {\n      \"Street1\": \"\",\n      \"City\": \"\",\n      \"State\": \"\",\n      \"Zip\": \"\"\n    }\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Distributor Created",
@@ -26950,6 +26791,25 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "DistributorName": "Telegent Distributor 2",
+                "BillingAddress": {
+                  "Street1": "",
+                  "Street2": "",
+                  "City": "",
+                  "State": "",
+                  "Zip": "",
+                  "Country": ""
+                },
+                "MailingAddress": {
+                  "Street1": "",
+                  "Street2": "",
+                  "City": "",
+                  "State": "",
+                  "Zip": "",
+                  "Country": ""
+                }
               }
             }
           }
@@ -26964,16 +26824,6 @@
         "summary": "Update Distributor",
         "description": "Update an existing distributor's information including name and address details.\n\n**What this does:** Returns the updated distributor record. Only fields you send are changed; omitted fields retain their current values.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/distributor`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"DistributorId\": \"DID-eab92510-1040-45a5-bb9c-0bad9272f89d\",\n  \"DistributorName\": \"Telegent Distributor 2.1\",\n  \"BillingAddress\": {\n    \"Street1\": \"\",\n    \"Street2\": \"\",\n    \"City\": \"\",\n    \"State\": \"\",\n    \"Zip\": \"\",\n    \"Country\": \"\"\n  },\n  \"MailingAddress\": {\n    \"Street1\": \"\",\n    \"Street2\": \"\",\n    \"City\": \"\",\n    \"State\": \"\",\n    \"Zip\": \"\",\n    \"Country\": \"\"\n  }\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/distributor/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"DistributorId\": \"DID-eab92510-1040-45a5-bb9c-0bad9272f89d\",\n    \"DistributorName\": \"Telegent Distributor 2.1\",\n    \"BillingAddress\": {\"Street1\": \"\", \"Street2\": \"\", \"City\": \"\", \"State\": \"\", \"Zip\": \"\", \"Country\": \"\"},\n    \"MailingAddress\": {\"Street1\": \"\", \"Street2\": \"\", \"City\": \"\", \"State\": \"\", \"Zip\": \"\", \"Country\": \"\"}\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Distributor Updated",
@@ -27360,6 +27210,26 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "DistributorId": "DID-eab92510-1040-45a5-bb9c-0bad9272f89d",
+                "DistributorName": "Telegent Distributor 2.1",
+                "BillingAddress": {
+                  "Street1": "",
+                  "Street2": "",
+                  "City": "",
+                  "State": "",
+                  "Zip": "",
+                  "Country": ""
+                },
+                "MailingAddress": {
+                  "Street1": "",
+                  "Street2": "",
+                  "City": "",
+                  "State": "",
+                  "Zip": "",
+                  "Country": ""
+                }
               }
             }
           }
@@ -27387,12 +27257,6 @@
               ]
             },
             "description": "Filter products by status"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/distributor/products?Filter=All' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -27747,12 +27611,6 @@
             "description": "Filter packages by status"
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/distributor/packages?Filter=Active' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Packages Retrieved",
@@ -28103,12 +27961,6 @@
             "description": "Filter subscriptions by status"
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/distributor/subscriptions?Filter=Active' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Subscriptions Retrieved",
@@ -28441,12 +28293,6 @@
             "description": "Account ID to retrieve details for"
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account?AccountId=AID-eab92510-1040-45a5-bb9c-0bad9272f89d' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Account Details Retrieved",
@@ -28774,16 +28620,6 @@
         "summary": "Create New Account",
         "description": "Create a new account with administrator email, billing, and mailing address information. Returns the newly created account details.\n\n**What this does:** Returns the new account's `AccountId` (`AID-`) and confirmation of the created details. Store the `AID-` — it is required when creating subscribers and subscriptions under this account.\n\n**Next steps:**\n- Create a subscriber under this account — `POST /v1.0/subscribers/create`\n- Assign packages — `POST /v1.0/subscriptions`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"AccountName\": \"Telegent Account 3\",\n  \"AccountAdmin\": \"jerome@joonto.com\",\n  \"BillingAddress\": {\n    \"Street1\": \"Street 1\",\n    \"Street2\": \"Street 2\",\n    \"City\": \"Heber\",\n    \"State\": \"Utah\",\n    \"Zip\": \"\",\n    \"Country\": \"USA\"\n  },\n  \"MailingAddress\": {\n    \"Street1\": null,\n    \"City\": null,\n    \"State\": null,\n    \"Zip\": null\n  }\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/account/create \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"AccountName\": \"Telegent Account 3\",\n    \"AccountAdmin\": \"jerome@joonto.com\",\n    \"BillingAddress\": {\n      \"Street1\": \"Street 1\",\n      \"City\": \"Heber\",\n      \"State\": \"Utah\"\n    }\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Account Created",
@@ -29174,6 +29010,24 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "AccountName": "Telegent Account 3",
+                "AccountAdmin": "jerome@joonto.com",
+                "BillingAddress": {
+                  "Street1": "Street 1",
+                  "Street2": "Street 2",
+                  "City": "Heber",
+                  "State": "Utah",
+                  "Zip": "",
+                  "Country": "USA"
+                },
+                "MailingAddress": {
+                  "Street1": null,
+                  "City": null,
+                  "State": null,
+                  "Zip": null
+                }
               }
             }
           }
@@ -29188,16 +29042,6 @@
         "summary": "Update Account",
         "description": "Update an existing account's information including name and address details.\n\n**What this does:** Returns the updated account record. Only the fields you send are changed; omitted fields retain their current values.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/account`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"AccountName\": \"Telegent Account 3.1\",\n  \"BillingAddress\": {\n    \"Street1\": \"Street 1\",\n    \"Street2\": \"Street 2\",\n    \"City\": \"Heber\",\n    \"State\": \"Utah\",\n    \"Zip\": \"\",\n    \"Country\": \"USA\"\n  }\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/account/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"AccountName\": \"Telegent Account 3.1\",\n    \"BillingAddress\": {\n      \"Street1\": \"Street 1\",\n      \"City\": \"Heber\"\n    }\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Account Updated",
@@ -29574,6 +29418,17 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "AccountName": "Telegent Account 3.1",
+                "BillingAddress": {
+                  "Street1": "Street 1",
+                  "Street2": "Street 2",
+                  "City": "Heber",
+                  "State": "Utah",
+                  "Zip": "",
+                  "Country": "USA"
+                }
               }
             }
           }
@@ -29596,12 +29451,6 @@
               "type": "string"
             },
             "description": "Subscriber ID to retrieve details for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/get?SubscriberId=TSUID-03F91441-B652-4EBE-B310-24652F872584' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -29923,16 +29772,6 @@
         "summary": "Create Subscriber",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Required:** Account ID (AID) — provided by your Telegent representative\n\n---\n\nCreate a new subscriber with name, email, phone numbers, role, and password. Returns the newly created subscriber details.\n\n**What this does:** Returns the new subscriber's `SubscriberId` (`TSUID-`) and full profile. The `TSUID-` is required for creating subscriptions, assigning numbers, and configuring AI Guardian. Store it for all subsequent subscriber-related calls.\n\n**Next steps:**\n- Assign a subscription — `POST /v1.0/subscriptions`\n- Provision a number — `POST /v1.0/numbers/provision`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"Name\": \"Jerome User 4\",\n  \"Email\": \"jerome4@joonto.com\",\n  \"PhoneNumbers\": [\"+1234567890\"],\n  \"Role\": \"Subscriber\",\n  \"Password\": \"1234567890\",\n  \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/create \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"Name\": \"Jerome User 4\",\n    \"Email\": \"jerome4@joonto.com\",\n    \"PhoneNumbers\": [\"+1234567890\"],\n    \"Role\": \"Subscriber\",\n    \"Password\": \"1234567890\",\n    \"AccountId\": \"AID-ab12345-2725-45a1-bd5e-526ed19799xx\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the new Subscriber ID (TSUID-) and account details",
@@ -30299,6 +30138,16 @@
                     "example": "AID-eab92510-1040-45a5-bb9c-0bad9272f89d"
                   }
                 }
+              },
+              "example": {
+                "Name": "Jerome User 4",
+                "Email": "jerome4@joonto.com",
+                "PhoneNumbers": [
+                  "+1234567890"
+                ],
+                "Role": "Subscriber",
+                "Password": "1234567890",
+                "AccountId": "AID-ab12345-2725-45a1-bd5e-526ed19799xx"
               }
             }
           }
@@ -30313,16 +30162,6 @@
         "summary": "Update Subscriber",
         "description": "Update an existing subscriber's information including name, phone numbers, role, and password.\n\n**What this does:** Returns the updated subscriber record. Only the fields you send are changed; omitted fields retain their current values.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/subscribers/get`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-33bde952-f6ec-4171-ad11-9697cfed79e8\",\n  \"Name\": \"Jerome User 3.1\",\n  \"PhoneNumbers\": [\"+1234567890\"],\n  \"Role\": \"Subscriber\",\n  \"Password\": \"bUxdo6-zewqez\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-33bde952-f6ec-4171-ad11-9697cfed79e8\",\n    \"Name\": \"Jerome User 3.1\",\n    \"PhoneNumbers\": [\"+1234567890\"],\n    \"Role\": \"Subscriber\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Subscriber Updated",
@@ -30678,6 +30517,15 @@
                     "example": "bUxdo6-zewqez"
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-33bde952-f6ec-4171-ad11-9697cfed79e8",
+                "Name": "Jerome User 3.1",
+                "PhoneNumbers": [
+                  "+1234567890"
+                ],
+                "Role": "Subscriber",
+                "Password": "bUxdo6-zewqez"
               }
             }
           }
@@ -30692,16 +30540,6 @@
         "summary": "Transfer Subscriber",
         "description": "Transfer a subscriber from one account to another. Requires both origin and destination account IDs.\n\n**What this does:** Returns a confirmation that the subscriber has been moved to the target account. All subscriptions and number assignments are preserved. Use this in reseller workflows when a subscriber needs to move between managed accounts.\n\n**Next steps:**\n- Confirm new account association — `GET /v1.0/subscribers/get`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-33bde952-f6ec-4171-ad11-9697cfed79e8\",\n  \"FromAccountId\": \"AID-eab92510-1040-45a5-bb9c-0bad9272f89d\",\n  \"ToAccountId\": \"AID-ceb82085-2725-45a1-bd5e-526ed19799d7\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/transfer \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-33bde952-f6ec-4171-ad11-9697cfed79e8\",\n    \"FromAccountId\": \"AID-eab92510-1040-45a5-bb9c-0bad9272f89d\",\n    \"ToAccountId\": \"AID-ceb82085-2725-45a1-bd5e-526ed19799d7\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Subscriber Transferred",
@@ -31039,6 +30877,11 @@
                     "example": "AID-ceb82085-2725-45a1-bd5e-526ed19799d7"
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-33bde952-f6ec-4171-ad11-9697cfed79e8",
+                "FromAccountId": "AID-eab92510-1040-45a5-bb9c-0bad9272f89d",
+                "ToAccountId": "AID-ceb82085-2725-45a1-bd5e-526ed19799d7"
               }
             }
           }
@@ -31053,16 +30896,6 @@
         "summary": "Create Message Filter",
         "description": "Create a new message filter that controls what messages a subscriber can send and receive.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing Subscriber (`TSUID-`) — `POST /v1.0/subscribers/create`\n- AI Guardian enabled for messages — `POST /v1.0/subscribers/guardian-features`\n\n**What this does:** Creates a filter and returns a `MessageFilterId` (`MFID-`). The filter applies to the specified phone number. Configure mode (`ACTIVE`/`MONITOR_ONLY`/`INACTIVE`), allowed/blocked contacts, keyword rules, and restrictions on links, media, and unknown numbers. The filter takes effect immediately.\n\n**Next steps:**\n- Verify it was saved — `GET /v1.0/subscribers/message-filter`\n- Add trusted contacts that bypass filtering — `POST /v1.0/subscribers/message-filter/allowed-contacts/add`\n- Add senders to silently drop — `POST /v1.0/subscribers/message-filter/blocked-contacts/add`\n- Review configured keywords — `GET /v1.0/subscribers/message-filter/keywords`\n- Update later — `POST /v1.0/subscribers/message-filter/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"Phone\": \"+1234567890\",\n  \"FilterMode\": \"ACTIVE\",\n  \"AllowedContacts\": [\"+1111111111\", \"+2222222222\"],\n  \"BlockedContacts\": [\"+3333333333\"],\n  \"KeywordFilter\": \"{\\\"CustomKeywords\\\":[\\\"inappropriate\\\",\\\"banned\\\"],\\\"SystemKeywords\\\":{\\\"Profanity\\\":[\\\"word1\\\",\\\"word2\\\"],\\\"Violence\\\":[\\\"threat1\\\"]},\\\"SeverityMap\\\":{\\\"Word1\\\":\\\"HIGH\\\",\\\"Inappropriate\\\":\\\"MEDIUM\\\"}}\",\n  \"NotificationPhones\": [\"+9999999999\"],\n  \"ApplyToOutbound\": true,\n  \"ApplyToInbound\": true,\n  \"BlockUnknownNumbers\": true,\n  \"BlockLinks\": true,\n  \"BlockMedia\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"Phone\": \"+1234567890\",\n    \"FilterMode\": \"ACTIVE\",\n    \"AllowedContacts\": [\"+1111111111\", \"+2222222222\"],\n    \"BlockedContacts\": [\"+3333333333\"],\n    \"NotificationPhones\": [\"+9999999999\"],\n    \"ApplyToOutbound\": true,\n    \"ApplyToInbound\": true,\n    \"BlockUnknownNumbers\": true,\n    \"BlockLinks\": true,\n    \"BlockMedia\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Message Filter Created",
@@ -31459,6 +31292,27 @@
                     "description": "If `true`, MMS messages with media attachments (images, video, audio) are blocked."
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "Phone": "+1234567890",
+                "FilterMode": "ACTIVE",
+                "AllowedContacts": [
+                  "+1111111111",
+                  "+2222222222"
+                ],
+                "BlockedContacts": [
+                  "+3333333333"
+                ],
+                "KeywordFilter": "{\"CustomKeywords\":[\"inappropriate\",\"banned\"],\"SystemKeywords\":{\"Profanity\":[\"word1\",\"word2\"],\"Violence\":[\"threat1\"]},\"SeverityMap\":{\"Word1\":\"HIGH\",\"Inappropriate\":\"MEDIUM\"}}",
+                "NotificationPhones": [
+                  "+9999999999"
+                ],
+                "ApplyToOutbound": true,
+                "ApplyToInbound": true,
+                "BlockUnknownNumbers": true,
+                "BlockLinks": true,
+                "BlockMedia": true
               }
             }
           }
@@ -31496,12 +31350,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/message-filter?SubscriberId=TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -31837,16 +31685,6 @@
         "summary": "Update Message Filter",
         "description": "Modify an existing message filter without deleting and recreating it.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing `MessageFilterId` (`MFID-`) — find one with `GET /v1.0/subscribers/message-filter`\n\n**What this does:** Replaces the configuration of the specified filter. Use this to switch modes (e.g., `MONITOR_ONLY` → `ACTIVE` to start enforcing rules), update contact lists, adjust keyword settings, or toggle link/media/unknown-number restrictions. Changes take effect immediately.\n\n**Next steps:**\n- Verify the change — `GET /v1.0/subscribers/message-filter`\n- Pause without deleting — set `FilterMode` to `INACTIVE` and call this endpoint again\n- Permanently remove — `POST /v1.0/subscribers/message-filter/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"FilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"Phone\": \"+1234567890\",\n  \"FilterMode\": \"MONITOR_ONLY\",\n  \"AllowedContacts\": [\"+1111111111\", \"+2222222222\"],\n  \"BlockedContacts\": [\"+3333333333\"],\n  \"KeywordFilter\": \"\\\"CustomKeywords\\\":[\\\"inappropriate\\\",\\\"banned\\\"],\\\"SystemKeywords\\\":{\\\"Profanity\\\":[\\\"word1\\\",\\\"word2\\\"],\\\"Violence\\\":[\\\"threat1\\\"]},\\\"SeverityMap\\\":{\\\"Word1\\\":\\\"HIGH\\\",\\\"Inappropriate\\\":\\\"MEDIUM\\\"}\",\n  \"NotificationPhones\": [\"+9999999999\"],\n  \"ApplyToOutbound\": true,\n  \"ApplyToInbound\": true,\n  \"BlockUnknownNumbers\": true,\n  \"BlockLinks\": true,\n  \"BlockMedia\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"FilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"Phone\": \"+1234567890\",\n    \"FilterMode\": \"MONITOR_ONLY\",\n    \"AllowedContacts\": [\"+1111111111\", \"+2222222222\"],\n    \"BlockedContacts\": [\"+3333333333\"],\n    \"NotificationPhones\": [\"+9999999999\"],\n    \"ApplyToOutbound\": true,\n    \"ApplyToInbound\": true,\n    \"BlockUnknownNumbers\": true,\n    \"BlockLinks\": true,\n    \"BlockMedia\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Message Filter Updated",
@@ -32243,6 +32081,28 @@
                     "description": "If `true`, MMS messages with media attachments (images, video, audio) are blocked."
                   }
                 }
+              },
+              "example": {
+                "FilterId": "MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1",
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "Phone": "+1234567890",
+                "FilterMode": "MONITOR_ONLY",
+                "AllowedContacts": [
+                  "+1111111111",
+                  "+2222222222"
+                ],
+                "BlockedContacts": [
+                  "+3333333333"
+                ],
+                "KeywordFilter": "\"CustomKeywords\":[\"inappropriate\",\"banned\"],\"SystemKeywords\":{\"Profanity\":[\"word1\",\"word2\"],\"Violence\":[\"threat1\"]},\"SeverityMap\":{\"Word1\":\"HIGH\",\"Inappropriate\":\"MEDIUM\"}",
+                "NotificationPhones": [
+                  "+9999999999"
+                ],
+                "ApplyToOutbound": true,
+                "ApplyToInbound": true,
+                "BlockUnknownNumbers": true,
+                "BlockLinks": true,
+                "BlockMedia": true
               }
             }
           }
@@ -32257,16 +32117,6 @@
         "summary": "Delete Message Filter",
         "description": "Permanently remove a message filter from a subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing `MessageFilterId` (`MFID-`)\n\n**What this does:** Permanently deletes the filter and all its associated contacts and keyword rules. Messages will be delivered without any filtering after this call. **This cannot be undone.**\n\n**Tip:** If you only want to pause filtering without losing your settings, use `POST /v1.0/subscribers/message-filter/update` and set `FilterMode` to `INACTIVE` instead.\n\n**Next steps:**\n- Confirm removal — `GET /v1.0/subscribers/message-filter`\n- Create a new filter — `POST /v1.0/subscribers/message-filter`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"MessageFilterId\": \"MFID-e06a2c10-eeb4-4ca7-b3ef-2254b9a79e25\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"MessageFilterId\": \"MFID-e06a2c10-eeb4-4ca7-b3ef-2254b9a79e25\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Message Filter Deleted",
@@ -32584,6 +32434,9 @@
                     "example": "MFID-e06a2c10-eeb4-4ca7-b3ef-2254b9a79e25"
                   }
                 }
+              },
+              "example": {
+                "MessageFilterId": "MFID-e06a2c10-eeb4-4ca7-b3ef-2254b9a79e25"
               }
             }
           }
@@ -32625,12 +32478,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/message-filter/allowed-contacts?SubscriberId=SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441&MessageFilterId=MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -32946,16 +32793,6 @@
         "summary": "Add Allowed Contacts",
         "description": "Add trusted phone numbers that bypass message filtering.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and an existing `MessageFilterId` (`MFID-`)\n\n**What this does:** Adds one or more phone numbers (E.164 format) to the allowed list. Messages from these contacts bypass all content filtering — keyword checks, link blocking, and media restrictions do not apply. Common use case: family members, doctors, or known business numbers.\n\n**Next steps:**\n- Verify the addition — `GET /v1.0/subscribers/message-filter/allowed-contacts`\n- Undo — `POST /v1.0/subscribers/message-filter/allowed-contacts/remove`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n  \"Contacts\": [\"+15555555555\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter/allowed-contacts/add \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n    \"Contacts\": [\"+15555555555\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Allowed Contacts Added",
@@ -33294,6 +33131,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "MessageFilterId": "MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1",
+                "Contacts": [
+                  "+15555555555"
+                ]
               }
             }
           }
@@ -33308,16 +33152,6 @@
         "summary": "Remove Allowed Contacts",
         "description": "Remove phone numbers from the allowed contacts list.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and `MessageFilterId` (`MFID-`)\n- Numbers must currently be on the allowed list — confirm with `GET /v1.0/subscribers/message-filter/allowed-contacts`\n\n**What this does:** Removes one or more phone numbers from the allowed list. After removal, messages from those contacts go through the normal filter pipeline (keyword checks, link blocking, etc.).\n\n**Next steps:**\n- Verify the removal — `GET /v1.0/subscribers/message-filter/allowed-contacts`\n- Block the contact instead — `POST /v1.0/subscribers/message-filter/blocked-contacts/add`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n  \"Contacts\": [\"+15555555555\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter/allowed-contacts/remove \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n    \"Contacts\": [\"+15555555555\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Allowed Contacts Removed",
@@ -33655,6 +33489,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "MessageFilterId": "MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1",
+                "Contacts": [
+                  "+15555555555"
+                ]
               }
             }
           }
@@ -33696,12 +33537,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/message-filter/blocked-contacts?SubscriberId=SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441&MessageFilterId=MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -34016,16 +33851,6 @@
         "summary": "Add Blocked Contacts",
         "description": "Block phone numbers from messaging a subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and an existing `MessageFilterId` (`MFID-`)\n\n**What this does:** Adds one or more phone numbers to the blocked list. Messages from blocked contacts are silently dropped — they are never delivered, and the sender sees no error. Common use case: preventing unwanted or harassing contacts.\n\n**Next steps:**\n- Verify the addition — `GET /v1.0/subscribers/message-filter/blocked-contacts`\n- Undo — `POST /v1.0/subscribers/message-filter/blocked-contacts/remove`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n  \"Contacts\": [\"+14444444444\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter/blocked-contacts/add \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n    \"Contacts\": [\"+14444444444\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Blocked Contacts Added",
@@ -34363,6 +34188,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "MessageFilterId": "MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1",
+                "Contacts": [
+                  "+14444444444"
+                ]
               }
             }
           }
@@ -34377,16 +34209,6 @@
         "summary": "Remove Blocked Contacts",
         "description": "Unblock phone numbers so their messages start being delivered again.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and `MessageFilterId` (`MFID-`)\n- Numbers must currently be on the blocked list — confirm with `GET /v1.0/subscribers/message-filter/blocked-contacts`\n\n**What this does:** Removes one or more phone numbers from the blocked list. After removal, messages from those contacts go through the normal filter pipeline and are delivered if they pass the rules.\n\n**Next steps:**\n- Verify the removal — `GET /v1.0/subscribers/message-filter/blocked-contacts`\n- Add to allowed instead — `POST /v1.0/subscribers/message-filter/allowed-contacts/add`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n  \"Contacts\": [\"+3333333333\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/message-filter/blocked-contacts/remove \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"MessageFilterId\": \"MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1\",\n    \"Contacts\": [\"+3333333333\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Blocked Contacts Removed",
@@ -34723,6 +34545,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "MessageFilterId": "MFID-7435d672-a2d0-451e-ab62-45499f5bc7a1",
+                "Contacts": [
+                  "+3333333333"
+                ]
               }
             }
           }
@@ -34764,12 +34593,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/message-filter/keywords?SubscriberId=SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441&MessageFilterId=MFID-83ee4478-3e58-40a4-a528-b5aad4687b10' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -35097,16 +34920,6 @@
         "summary": "Configure Guardian Features",
         "description": "Enable or disable AI Guardian on a subscriber. This is the **first step** for every Guardian workflow — filters, keyword rules, and parent/child relationships will not function until Guardian is enabled here.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing Subscriber (`TSUID-`) — `POST /v1.0/subscribers/create`\n\n**What this does:** Turns AI Guardian on or off for the subscriber's calls and messages independently. Set `EnableIntelligentGuardianCalls` and `EnableIntelligentGuardianMessages` to `true` to enable monitoring; set both to `false` to fully disable Guardian.\n\n**Next steps:**\n- Confirm the change took effect — `GET /v1.0/subscribers/guardian-features`\n- Link a parent and child for supervision — `POST /v1.0/subscribers/guardians/relation`\n- Create a message filter — `POST /v1.0/subscribers/message-filter`\n- Create a call filter — `POST /v1.0/subscribers/call-filter`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n  \"EnableIntelligentGuardianCalls\": true,\n  \"EnableIntelligentGuardianMessages\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/guardian-features \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d\",\n    \"EnableIntelligentGuardianCalls\": true,\n    \"EnableIntelligentGuardianMessages\": true\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Guardian Features Saved",
@@ -35434,6 +35247,11 @@
                     "example": true
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d",
+                "EnableIntelligentGuardianCalls": true,
+                "EnableIntelligentGuardianMessages": true
               }
             }
           }
@@ -35462,12 +35280,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/guardian-features?SubscriberId=TSUID-d7b3-4696-bdd9-5b407d9e99ee-3985-444b8d' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -35781,16 +35593,6 @@
         "summary": "Create Guardian Relation",
         "description": "Link a parent (guardian) subscriber to a child subscriber so the parent can supervise the child's communications.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Both subscribers must exist (`TSUID-`) — `POST /v1.0/subscribers/create`\n- AI Guardian must be enabled on both subscribers — `POST /v1.0/subscribers/guardian-features`\n\n**What this does:** Creates a one-way parent-to-child link. The parent gains the ability to receive filter notifications, manage filters on behalf of the child, and use age-preset modes (`CHILD`, `TEENAGER`, `ADOLESCENT`) on the child's call filters.\n\n**Next steps:**\n- Verify the link — `GET /v1.0/subscribers/guardians/relation/parent` (lookup by parent) or `GET /v1.0/subscribers/guardians/relation/child` (lookup by child)\n- Create message and call filters on the child — `POST /v1.0/subscribers/message-filter`, `POST /v1.0/subscribers/call-filter`\n- Remove the link later — `POST /v1.0/subscribers/guardians/relation/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ParentSubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"ChildSubscriberId\": \"TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC\",\n  \"Relation\": \"Guardian\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/guardians/relation \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ParentSubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"ChildSubscriberId\": \"TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC\",\n    \"Relation\": \"Guardian\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Guardian Relation Created",
@@ -36120,6 +35922,11 @@
                     "example": "Guardian"
                   }
                 }
+              },
+              "example": {
+                "ParentSubscriberId": "TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "ChildSubscriberId": "TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC",
+                "Relation": "Guardian"
               }
             }
           }
@@ -36150,12 +35957,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/guardians/relation/parent?ParentSubscriberId=TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -36492,12 +36293,6 @@
             }
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/guardians/relation/child?ChildSubscriberId=TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Guardian Relations Retrieved",
@@ -36814,16 +36609,6 @@
         "summary": "Remove Guardian Relation",
         "description": "Unlink a parent (guardian) from a child subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing parent-child relation\n\n**What this does:** Removes the guardian relation only. The subscribers themselves and their individual filters remain untouched. After removal, the parent will no longer receive filter notifications or be able to manage the child's filters.\n\n**Next steps:**\n- Confirm removal — `GET /v1.0/subscribers/guardians/relation/parent`\n- Re-establish the link later — `POST /v1.0/subscribers/guardians/relation`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"ParentSubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"ChildSubscriberId\": \"TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/guardians/relation/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"ParentSubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"ChildSubscriberId\": \"TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Guardian Relation Deleted",
@@ -37149,6 +36934,10 @@
                     "example": "TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC"
                   }
                 }
+              },
+              "example": {
+                "ParentSubscriberId": "TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "ChildSubscriberId": "TSUID-712C771C-2326-46E8-86BA-E4E58F3DABDC"
               }
             }
           }
@@ -37163,16 +36952,6 @@
         "summary": "Create Call Filter",
         "description": "Create a new call filter that controls who can place or receive calls for a subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing Subscriber (`TSUID-`) — `POST /v1.0/subscribers/create`\n- AI Guardian enabled for calls — `POST /v1.0/subscribers/guardian-features`\n- (Optional) For age-preset modes (`CHILD`, `TEENAGER`, `ADOLESCENT`): a parent-child guardian relation — `POST /v1.0/subscribers/guardians/relation`\n\n**What this does:** Creates a call filter and returns a `CallFilterId` (`CFID-`). Choose mode: `WHITELIST` (only allowed numbers ring through), `BLACKLIST` (block listed numbers, allow others), or an age preset that applies Telegent-recommended defaults. Configure transcription, keyword alerts, action on detection (warn/terminate/notify), and time-based restrictions. The filter takes effect immediately.\n\n**Next steps:**\n- Verify it was saved — `GET /v1.0/subscribers/call-filter`\n- Add allowed callers — `POST /v1.0/subscribers/call-filter/allowed-numbers/add`\n- Add blocked callers — `POST /v1.0/subscribers/call-filter/blocked-numbers/add`\n- Review keyword rules — `GET /v1.0/subscribers/call-filter/keywords`\n- Update later — `POST /v1.0/subscribers/call-filter/update`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"Phone\": \"+1234567890\",\n  \"FilterMode\": \"WHITELIST\",\n  \"AllowedNumbers\": [\"+1111111111\", \"+2222222222\"],\n  \"BlockedNumbers\": [\"+3333333333\"],\n  \"EnableTranscription\": true,\n  \"KeywordFilter\": \"{\\\"CustomKeywords\\\":[\\\"inappropriate\\\",\\\"banned\\\"],\\\"SystemKeywords\\\":{\\\"Profanity\\\":[\\\"word1\\\",\\\"word2\\\"],\\\"Violence\\\":[\\\"threat1\\\"]},\\\"SeverityMap\\\":{\\\"Word1\\\":\\\"HIGH\\\",\\\"Inappropriate\\\":\\\"MEDIUM\\\"}}\",\n  \"TranscriptionAction\": \"WARNING\",\n  \"WarningMessage\": \"This call may be terminated\",\n  \"NotificationPhones\": [\"+9999999999\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"Phone\": \"+1234567890\",\n    \"FilterMode\": \"WHITELIST\",\n    \"AllowedNumbers\": [\"+1111111111\", \"+2222222222\"],\n    \"BlockedNumbers\": [\"+3333333333\"],\n    \"EnableTranscription\": true,\n    \"TranscriptionAction\": \"WARNING\",\n    \"WarningMessage\": \"This call may be terminated\",\n    \"NotificationPhones\": [\"+9999999999\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Call Filter Created",
@@ -37596,6 +37375,25 @@
                     "description": "Optional schedule limiting when this filter is active (e.g., school hours, bedtime). Reserved for future use."
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "Phone": "+1234567890",
+                "FilterMode": "WHITELIST",
+                "AllowedNumbers": [
+                  "+1111111111",
+                  "+2222222222"
+                ],
+                "BlockedNumbers": [
+                  "+3333333333"
+                ],
+                "EnableTranscription": true,
+                "KeywordFilter": "{\"CustomKeywords\":[\"inappropriate\",\"banned\"],\"SystemKeywords\":{\"Profanity\":[\"word1\",\"word2\"],\"Violence\":[\"threat1\"]},\"SeverityMap\":{\"Word1\":\"HIGH\",\"Inappropriate\":\"MEDIUM\"}}",
+                "TranscriptionAction": "WARNING",
+                "WarningMessage": "This call may be terminated",
+                "NotificationPhones": [
+                  "+9999999999"
+                ]
               }
             }
           }
@@ -37633,12 +37431,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/call-filter?SubscriberId=TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -37976,16 +37768,6 @@
         "summary": "Update Call Filter",
         "description": "Modify an existing call filter without deleting and recreating it.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing `CallFilterId` (`CFID-`) — find one with `GET /v1.0/subscribers/call-filter`\n\n**What this does:** Replaces the configuration of the specified filter. Use this to change modes (e.g., `BLACKLIST` → `WHITELIST`), update allowed/blocked number lists, toggle transcription, change keyword alerts, or adjust restrictions like blocking unknown or international numbers. Note: the Update endpoint only accepts `WHITELIST` and `BLACKLIST` modes — age presets must be set on creation.\n\n**Next steps:**\n- Verify the change — `GET /v1.0/subscribers/call-filter`\n- Pause without deleting — use `POST /v1.0/subscribers/call-filter/update` with `EnableTranscription` off and an empty rules set, or delete the filter\n- Permanently remove — `POST /v1.0/subscribers/call-filter/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"FilterId\": \"CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499\",\n  \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"Phone\": \"+1234567891\",\n  \"FilterMode\": \"WHITELIST\",\n  \"AllowedNumbers\": [\"+1111111111\", \"+2222222222\"],\n  \"BlockedNumbers\": [\"+3333333333\"],\n  \"EnableTranscription\": true,\n  \"KeywordFilter\": \"{\\\"CustomKeywords\\\":[\\\"inappropriate\\\",\\\"banned\\\"],\\\"SystemKeywords\\\":{\\\"Profanity\\\":[\\\"word1\\\",\\\"word2\\\"],\\\"Violence\\\":[\\\"threat1\\\"]},\\\"SeverityMap\\\":{\\\"Word1\\\":\\\"HIGH\\\",\\\"Inappropriate\\\":\\\"MEDIUM\\\"}}\",\n  \"TranscriptionAction\": \"WARNING\",\n  \"WarningMessage\": \"This call may be terminated\",\n  \"NotificationPhones\": [\"+9999999999\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"FilterId\": \"CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499\",\n    \"SubscriberId\": \"SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"Phone\": \"+1234567891\",\n    \"FilterMode\": \"WHITELIST\",\n    \"AllowedNumbers\": [\"+1111111111\", \"+2222222222\"],\n    \"BlockedNumbers\": [\"+3333333333\"],\n    \"EnableTranscription\": true,\n    \"TranscriptionAction\": \"WARNING\",\n    \"WarningMessage\": \"This call may be terminated\",\n    \"NotificationPhones\": [\"+9999999999\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Call Filter Updated",
@@ -38395,6 +38177,26 @@
                     "description": "If `true`, any call flagged by keyword detection or other rules is recorded for later review."
                   }
                 }
+              },
+              "example": {
+                "FilterId": "CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499",
+                "SubscriberId": "SID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "Phone": "+1234567891",
+                "FilterMode": "WHITELIST",
+                "AllowedNumbers": [
+                  "+1111111111",
+                  "+2222222222"
+                ],
+                "BlockedNumbers": [
+                  "+3333333333"
+                ],
+                "EnableTranscription": true,
+                "KeywordFilter": "{\"CustomKeywords\":[\"inappropriate\",\"banned\"],\"SystemKeywords\":{\"Profanity\":[\"word1\",\"word2\"],\"Violence\":[\"threat1\"]},\"SeverityMap\":{\"Word1\":\"HIGH\",\"Inappropriate\":\"MEDIUM\"}}",
+                "TranscriptionAction": "WARNING",
+                "WarningMessage": "This call may be terminated",
+                "NotificationPhones": [
+                  "+9999999999"
+                ]
               }
             }
           }
@@ -38409,16 +38211,6 @@
         "summary": "Delete Call Filter",
         "description": "Permanently remove a call filter from a subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- An existing `CallFilterId` (`CFID-`)\n\n**What this does:** Permanently deletes the filter and all its associated allowed/blocked numbers and keyword rules. Calls will no longer be filtered after this call. **This cannot be undone.**\n\n**Next steps:**\n- Confirm removal — `GET /v1.0/subscribers/call-filter`\n- Create a new filter — `POST /v1.0/subscribers/call-filter`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"CallFilterId\": \"CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"CallFilterId\": \"CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Call Filter Deleted",
@@ -38736,6 +38528,9 @@
                     "example": "CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499"
                   }
                 }
+              },
+              "example": {
+                "CallFilterId": "CFID-05c3d6d2-21c2-4fab-8c7c-12746cad1499"
               }
             }
           }
@@ -38775,12 +38570,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/call-filter/allowed-numbers?SubscriberId=TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441&CallFilterId=CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -39095,16 +38884,6 @@
         "summary": "Add Allowed Numbers",
         "description": "Add trusted phone numbers that are allowed to call a subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and an existing `CallFilterId` (`CFID-`)\n- Filter is in `WHITELIST` mode for the allow list to actively gate callers (in other modes, the list is informational)\n\n**What this does:** Adds one or more phone numbers to the allowed callers list. In `WHITELIST` mode, only numbers on this list can ring the subscriber — all others are blocked or sent to voicemail. Common use case: family members, doctors, or known business contacts.\n\n**Next steps:**\n- Verify the addition — `GET /v1.0/subscribers/call-filter/allowed-numbers`\n- Undo — `POST /v1.0/subscribers/call-filter/allowed-numbers/remove`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n  \"Numbers\": [\"+15555555555\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter/allowed-numbers/add \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n    \"Numbers\": [\"+15555555555\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Allowed Numbers Added",
@@ -39442,6 +39221,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "CallFilterId": "CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6",
+                "Numbers": [
+                  "+15555555555"
+                ]
               }
             }
           }
@@ -39456,16 +39242,6 @@
         "summary": "Remove Allowed Numbers",
         "description": "Remove phone numbers from the allowed callers list.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and `CallFilterId` (`CFID-`)\n- Numbers must currently be on the allowed list — confirm with `GET /v1.0/subscribers/call-filter/allowed-numbers`\n\n**What this does:** Removes one or more phone numbers from the allowed list. In `WHITELIST` mode, calls from those numbers will no longer ring through and are treated like any other non-allowed caller.\n\n**Next steps:**\n- Verify the removal — `GET /v1.0/subscribers/call-filter/allowed-numbers`\n- Block the caller instead — `POST /v1.0/subscribers/call-filter/blocked-numbers/add`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n  \"Numbers\": [\"+15555555555\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter/allowed-numbers/remove \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n    \"Numbers\": [\"+15555555555\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Allowed Numbers Removed",
@@ -39802,6 +39578,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "CallFilterId": "CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6",
+                "Numbers": [
+                  "+15555555555"
+                ]
               }
             }
           }
@@ -39841,12 +39624,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/call-filter/blocked-numbers?SubscriberId=TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441&CallFilterId=CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -40161,16 +39938,6 @@
         "summary": "Add Blocked Numbers",
         "description": "Block phone numbers from calling a subscriber.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and an existing `CallFilterId` (`CFID-`)\n\n**What this does:** Adds one or more phone numbers to the blocked list. Calls from blocked numbers are rejected or silently dropped — the caller may hear a disconnect tone or nothing at all. Common use case: preventing unwanted, scam, or harassing callers from reaching a subscriber.\n\n**Next steps:**\n- Verify the addition — `GET /v1.0/subscribers/call-filter/blocked-numbers`\n- Undo — `POST /v1.0/subscribers/call-filter/blocked-numbers/remove`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n  \"Numbers\": [\"+15555555555\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter/blocked-numbers/add \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n    \"Numbers\": [\"+15555555555\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Blocked Numbers Added",
@@ -40508,6 +40275,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "CallFilterId": "CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6",
+                "Numbers": [
+                  "+15555555555"
+                ]
               }
             }
           }
@@ -40522,16 +40296,6 @@
         "summary": "Remove Blocked Numbers",
         "description": "Unblock phone numbers so they can call the subscriber again.\n\n**Prerequisites:**\n- Bearer token — `POST /v1.0/oauth2/tokens`\n- Subscriber ID and `CallFilterId` (`CFID-`)\n- Numbers must currently be on the blocked list — confirm with `GET /v1.0/subscribers/call-filter/blocked-numbers`\n\n**What this does:** Removes one or more phone numbers from the blocked list. After removal, calls from those numbers are handled normally according to the active filter mode (e.g., they will ring through in `BLACKLIST` mode unless they're caught by another rule).\n\n**Next steps:**\n- Verify the removal — `GET /v1.0/subscribers/call-filter/blocked-numbers`\n- Add to allowed instead — `POST /v1.0/subscribers/call-filter/allowed-numbers/add`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n  \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n  \"Numbers\": [\"+15555555555\"]\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/subscribers/call-filter/blocked-numbers/remove \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"SubscriberId\": \"TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441\",\n    \"CallFilterId\": \"CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6\",\n    \"Numbers\": [\"+15555555555\"]\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Blocked Numbers Removed",
@@ -40868,6 +40632,13 @@
                     ]
                   }
                 }
+              },
+              "example": {
+                "SubscriberId": "TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441",
+                "CallFilterId": "CFID-8e966d20-08b8-42bf-a11f-2fdf72c663d6",
+                "Numbers": [
+                  "+15555555555"
+                ]
               }
             }
           }
@@ -40882,16 +40653,6 @@
         "summary": "Create Workgroup",
         "description": "**Prerequisites:**\n- **Required:** Bearer token — `POST /v1.0/oauth2/tokens`\n- **Required:** Voice Route ID (CRID) — `POST /v1.0/voice/routes`\n\n---\n\nCreate a new workgroup for intelligent call routing. Workgroups support types such as IVR, simultaneous ring, and round-robin distribution. Returns a unique WorkgroupId.\n\n**What this does:** Returns the new workgroup's `WorkgroupId` (`WG-`) and full configuration. Once created, add members using `POST /v1.0/workgroups/activity` and assign the workgroup to a voice route.\n\n**Next steps:**\n- Add members — `POST /v1.0/workgroups/activity`\n- View account workgroups — `GET /v1.0/account/workgroups`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"Name\": \"IVR Workgroup\",\n  \"TelegentPhone\": \"+1234567890\",\n  \"Type\": \"IVR\",\n  \"CallOrder\": \"1\",\n  \"AnnouncementText\": \"Hello, welcome to Telegent. Press 1 for Sales, Press 2 for Support.\",\n  \"ScheduleId\": \"SID-3741d220-0663-4289-85df-c203f43db5a6\",\n  \"RecordCalls\": true,\n  \"TranscribeRecordings\": false\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/workgroups \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"Name\": \"IVR Workgroup\",\n    \"TelegentPhone\": \"+1234567890\",\n    \"Type\": \"IVR\",\n    \"ScheduleId\": \"SID-3741d220-0663-4289-85df-c203f43db5a6\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success — returns the new Workgroup ID (WID-) and configuration",
@@ -41311,6 +41072,16 @@
                     "description": "Account ID to associate workgroup with"
                   }
                 }
+              },
+              "example": {
+                "Name": "IVR Workgroup",
+                "TelegentPhone": "+1234567890",
+                "Type": "IVR",
+                "CallOrder": "1",
+                "AnnouncementText": "Hello, welcome to Telegent. Press 1 for Sales, Press 2 for Support.",
+                "ScheduleId": "SID-3741d220-0663-4289-85df-c203f43db5a6",
+                "RecordCalls": true,
+                "TranscribeRecordings": false
               }
             }
           }
@@ -41331,12 +41102,6 @@
               "type": "string"
             },
             "description": "The workgroup ID to retrieve details for"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/workgroups?WorkgroupId=WG-abc123' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -41653,16 +41418,6 @@
         "summary": "Update Workgroup",
         "description": "Update an existing workgroup configuration. Requires the WorkgroupId of the workgroup to modify.\n\n**What this does:** Returns the updated workgroup configuration. Only fields you send are changed; omitted fields retain their current values. Changes apply immediately to all calls routing through this workgroup.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/workgroups`\n- View members — `POST /v1.0/workgroups/activity`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"WorkgroupId\": \"WID-12345-abc-12345\",\n  \"Name\": \"Updated IVR Workgroup\",\n  \"Type\": \"round-robin\",\n  \"ScheduleId\": \"SID-3741d220-0663-4289-85df-c203f43db5a6\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/workgroups/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"WorkgroupId\": \"WID-12345-abc-12345\",\n    \"Name\": \"Updated IVR Workgroup\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Workgroup Updated",
@@ -42046,6 +41801,12 @@
                     "description": "Account ID"
                   }
                 }
+              },
+              "example": {
+                "WorkgroupId": "WID-12345-abc-12345",
+                "Name": "Updated IVR Workgroup",
+                "Type": "round-robin",
+                "ScheduleId": "SID-3741d220-0663-4289-85df-c203f43db5a6"
               }
             }
           }
@@ -42060,16 +41821,6 @@
         "summary": "Create Workgroup Activity",
         "description": "Add a member (user or nested workgroup) to an existing workgroup. Each activity defines how calls are distributed to that member including their position (DigitOrder) and notification preferences.\n\n**What this does:** Returns the new activity record including the `ActivityId` and member configuration. Each activity represents one member in the workgroup ring sequence. The `CallOrder` field determines ring priority.\n\n**Next steps:**\n- Update a member — `POST /v1.0/workgroups/activity/update`\n- Remove a member — `POST /v1.0/workgroups/activity/delete`\n- View the workgroup — `GET /v1.0/workgroups`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"DigitOrder\": 1,\n  \"PhoneNumber\": \"+1234567890\",\n  \"WorkgroupId\": \"WID-12345-abc-12345\",\n  \"Type\": \"Workgroup\",\n  \"ReferenceWorkgroupId\": \"WID-12345-abc-12345\",\n  \"ReferenceUserId\": \"\",\n  \"SmsNotification\": true,\n  \"EmailNotification\": false\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/workgroups/activity \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"DigitOrder\": 1,\n    \"WorkgroupId\": \"WID-12345-abc-12345\",\n    \"Type\": \"User\",\n    \"ReferenceUserId\": \"USER-abc-123\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Workgroup Activity Created",
@@ -42425,6 +42176,16 @@
                     "example": false
                   }
                 }
+              },
+              "example": {
+                "DigitOrder": 1,
+                "PhoneNumber": "+1234567890",
+                "WorkgroupId": "WID-12345-abc-12345",
+                "Type": "Workgroup",
+                "ReferenceWorkgroupId": "WID-12345-abc-12345",
+                "ReferenceUserId": "",
+                "SmsNotification": true,
+                "EmailNotification": false
               }
             }
           }
@@ -42439,16 +42200,6 @@
         "summary": "Update Workgroup Activity",
         "description": "Update the configuration of a member within a workgroup. A workgroup activity represents an individual agent, destination, or nested workgroup within a ring group. Modify fields such as dial order (DigitOrder), forwarding number, or notification preferences. Requires the WorkgroupActivityId (WAID-) of the activity to update.\n\n**What this does:** Returns the updated activity record. Use this to change a member's ring order, SIP details, or timeout settings within the workgroup.\n\n**Next steps:**\n- Confirm the update — `GET /v1.0/workgroups`\n- Remove the member — `POST /v1.0/workgroups/activity/delete`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"WorkgroupActivityId\": \"WAID-12345-abc-123456\",\n  \"DigitOrder\": 2,\n  \"PhoneNumber\": \"+1234567890\",\n  \"WorkgroupId\": \"WID-12345-abc-12345\",\n  \"Type\": \"User\",\n  \"ReferenceUserId\": \"USER-abc-456\",\n  \"SmsNotification\": true,\n  \"EmailNotification\": true\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/workgroups/activity/update \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"WorkgroupActivityId\": \"WAID-12345-abc-123456\",\n    \"DigitOrder\": 2\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Workgroup Activity Updated",
@@ -42804,6 +42555,16 @@
                     "description": "Enable email notification"
                   }
                 }
+              },
+              "example": {
+                "WorkgroupActivityId": "WAID-12345-abc-123456",
+                "DigitOrder": 2,
+                "PhoneNumber": "+1234567890",
+                "WorkgroupId": "WID-12345-abc-12345",
+                "Type": "User",
+                "ReferenceUserId": "USER-abc-456",
+                "SmsNotification": true,
+                "EmailNotification": true
               }
             }
           }
@@ -42818,16 +42579,6 @@
         "summary": "Delete Workgroup Activity",
         "description": "Remove a member activity from a workgroup. The workgroup itself is not deleted.\n\n**What this does:** Returns a deletion confirmation. Removing the activity removes that member from the workgroup's ring sequence. The workgroup itself is not affected.\n\n**Next steps:**\n- View the updated workgroup — `GET /v1.0/workgroups`\n- Add a replacement member — `POST /v1.0/workgroups/activity`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"WorkgroupActivityId\": \"WAID-4dec6beb-3985-444b-8c06-8baa70dc1416\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/workgroups/activity/delete \\\n  -H 'Authorization: Bearer YOUR_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"WorkgroupActivityId\": \"WAID-4dec6beb-3985-444b-8c06-8baa70dc1416\"\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Workgroup Activity Deleted",
@@ -43144,6 +42895,9 @@
                     "example": "WAID-4dec6beb-3985-444b-8c06-8baa70dc1416"
                   }
                 }
+              },
+              "example": {
+                "WorkgroupActivityId": "WAID-4dec6beb-3985-444b-8c06-8baa70dc1416"
               }
             }
           }
@@ -43166,12 +42920,6 @@
               "type": "string"
             },
             "description": "The workgroup ID to delete"
-          }
-        ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X POST 'https://api.telegent.com/v1.0/workgroups/delete?WorkgroupId=WG-abc123' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
           }
         ],
         "responses": {
@@ -43484,12 +43232,6 @@
         "summary": "Get Account Schedules",
         "description": "Retrieve a list of all schedules configured for your account.\n\n**What this does:** Returns a list of schedule IDs and names configured on the account. Schedules control business-hours routing for workgroups. Use this to look up a `SCH-` ID before attaching it to a workgroup.\n\n**Next steps:**\n- Get full schedule details — `GET /v1.0/schedules`\n- Create a schedule — `POST /v1.0/schedules`",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/account/schedules' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Account Schedules List",
@@ -43848,12 +43590,6 @@
             }
           }
         ],
-        "x-codeSamples": [
-          {
-            "lang": "cURL",
-            "source": "curl -X GET 'https://api.telegent.com/v1.0/subscribers/call-filter/keywords?SubscriberId=TSUID-C7AB61E0-9AD9-4512-ACA8-EDA284131441&CallFilterId=CFID-4bb4817b-7399-4949-97e9-ecad885a190f' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Keywords Retrieved",
@@ -44179,16 +43915,6 @@
         "summary": "Data Usage Update Renewal Info",
         "description": "Configure the monthly or weekly data usage renewal cycle for one or more phone numbers. Use this endpoint to set the day usage resets, enable or disable auto-renew, and optionally zero out current usage immediately.\n\n**What this does:** Updates the renewal schedule anchored to each number's individual  — this is not a global calendar reset. Set  to zero out a number's current usage immediately without waiting for the next cycle.\n\n**Next steps:**\n- Confirm current usage after a reset — \n- Review configured thresholds — ",
         "parameters": [],
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumbers\": [\n    { \"Number\": \"+18014730876\" }\n  ],\n  \"ResetUsage\": false,\n  \"AutoRenew\": true,\n  \"PeriodType\": \"M\",\n  \"PeriodValue\": 1,\n  \"RenewalDay\": 1\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/data-usage/update-renewal-info \\n  -H 'Authorization: Bearer YOUR_TOKEN' \\n  -H 'Content-Type: application/json' \\n  -d '{\n    \"PhoneNumbers\": [\n      { \"Number\": \"+18014730876\" }\n    ],\n    \"ResetUsage\": false,\n    \"AutoRenew\": true,\n    \"PeriodType\": \"M\",\n    \"PeriodValue\": 1,\n    \"RenewalDay\": 1\n  }'"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Renewal settings updated successfully",
@@ -44553,6 +44279,18 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "PhoneNumbers": [
+                  {
+                    "Number": "+18014730876"
+                  }
+                ],
+                "ResetUsage": false,
+                "AutoRenew": true,
+                "PeriodType": "M",
+                "PeriodValue": 1,
+                "RenewalDay": 1
               }
             }
           }
@@ -44887,16 +44625,18 @@
             }
           }
         },
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"AccountId\": \"AID-1234567\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X GET \"https://api.telegent.com/v1.0/account/webhooks?AccountId=AID-1234567\" \\\n  -H \"Authorization: Bearer <token>\" \\\n  -H \"Content-Type: application/json\""
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "AccountId": "AID-1234567"
+              }
+            }
           }
-        ]
+        }
       }
     },
     "/v1.0/numbers/reactivate": {
@@ -44912,6 +44652,10 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ReactivateNumber_Request"
+              },
+              "example": {
+                "PhoneNumber": "+12345678901",
+                "AccountId": "AID-8f3c2a91b4d7"
               }
             },
             "text/json": {
@@ -45227,17 +44971,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"PhoneNumber\": \"+12345678901\",\n  \"AccountId\": \"AID-8f3c2a91b4d7\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/numbers/reactivate \\\n  -H \"Authorization: Bearer <token>\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"PhoneNumber\": \"+12345678901\",\n    \"AccountId\": \"AID-8f3c2a91b4d7\"\n  }'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/subscriptions/thresholds": {
@@ -50853,16 +50587,19 @@
             }
           }
         },
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"AccountId\": \"AID-1234567\",\n  \"WebhookId\": \"WHID-1234567\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X GET \"https://api.telegent.com/v1.0/webhook?AccountId=AID-1234567&WebhookId=WHID-1234567\" \\\n  -H \"Authorization: Bearer <token>\" \\\n  -H \"Content-Type: application/json\""
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "AccountId": "AID-1234567",
+                "WebhookId": "WHID-1234567"
+              }
+            }
           }
-        ]
+        }
       }
     },
     "/v1.0/webhook/create": {
@@ -50878,6 +50615,17 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Webhook_Request"
+              },
+              "example": {
+                "AccountId": "AID-1234567",
+                "WebhookUrl": "https://api.example.com/telegent/events",
+                "Method": "POST",
+                "DataFormat": "json",
+                "AuthenticationType": "Basic",
+                "AuthenticationUsername": "webhook_user",
+                "AuthenticationPassword": "s3cureP@ss",
+                "AuthenticationToken": "",
+                "SubscribedEvents": "Order_Update"
               }
             },
             "text/json": {
@@ -51193,17 +50941,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"AccountId\": \"AID-1234567\",\n  \"WebhookUrl\": \"https://api.example.com/telegent/events\",\n  \"Method\": \"POST\",\n  \"DataFormat\": \"json\",\n  \"AuthenticationType\": \"Basic\",\n  \"AuthenticationUsername\": \"webhook_user\",\n  \"AuthenticationPassword\": \"s3cureP@ss\",\n  \"AuthenticationToken\": \"\",\n  \"SubscribedEvents\": \"Order_Update\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/webhook/create \\\n  -H \"Authorization: Bearer <token>\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"AccountId\": \"AID-1234567\",\n    \"WebhookUrl\": \"https://api.example.com/telegent/events\",\n    \"Method\": \"POST\",\n    \"DataFormat\": \"json\",\n    \"AuthenticationType\": \"Basic\",\n    \"AuthenticationUsername\": \"webhook_user\",\n    \"AuthenticationPassword\": \"s3cureP@ss\",\n    \"AuthenticationToken\": \"\",\n    \"SubscribedEvents\": \"Order_Update\"\n  }'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/webhook/update": {
@@ -51219,6 +50957,18 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Update_Webhook_Request"
+              },
+              "example": {
+                "WebhookId": "WID-1234567",
+                "AccountId": "AID-1234567",
+                "WebhookUrl": "https://api.telegent.com/test",
+                "Method": "POST",
+                "DataFormat": "json",
+                "AuthenticationType": "Basic",
+                "AuthenticationUsername": "User",
+                "AuthenticationPassword": "pw",
+                "AuthenticationToken": "",
+                "SubscribedEvents": "Order_Update, New_SMS"
               }
             },
             "text/json": {
@@ -51534,17 +51284,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"WebhookId\": \"WID-1234567\",\n  \"AccountId\": \"AID-1234567\",\n  \"WebhookUrl\": \"https://api.telegent.com/test\",\n  \"Method\": \"POST\",\n  \"DataFormat\": \"json\",\n  \"AuthenticationType\": \"Basic\",\n  \"AuthenticationUsername\": \"User\",\n  \"AuthenticationPassword\": \"pw\",\n  \"AuthenticationToken\": \"\",\n  \"SubscribedEvents\": \"Order_Update, New_SMS\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/webhook/update \\\n  -H \"Authorization: Bearer <token>\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"WebhookId\": \"WID-1234567\",\n    \"AccountId\": \"AID-1234567\",\n    \"WebhookUrl\": \"https://api.telegent.com/test\",\n    \"Method\": \"POST\",\n    \"DataFormat\": \"json\",\n    \"AuthenticationType\": \"Basic\",\n    \"AuthenticationUsername\": \"User\",\n    \"AuthenticationPassword\": \"pw\",\n    \"AuthenticationToken\": \"\",\n    \"SubscribedEvents\": \"Order_Update, New_SMS\"\n  }'"
-          }
-        ]
+        }
       }
     },
     "/v1.0/webhook/delete": {
@@ -51560,6 +51300,10 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Delete_Webhook_Request"
+              },
+              "example": {
+                "WebhookId": "WID-1234567",
+                "AccountId": "AID-1234567"
               }
             },
             "text/json": {
@@ -51875,17 +51619,7 @@
               }
             }
           }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "JSON",
-            "source": "{\n  \"WebhookId\": \"WID-1234567\",\n  \"AccountId\": \"AID-1234567\"\n}"
-          },
-          {
-            "lang": "cURL",
-            "source": "curl -X POST https://api.telegent.com/v1.0/webhook/delete \\\n  -H \"Authorization: Bearer <token>\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"WebhookId\": \"WID-1234567\",\n    \"AccountId\": \"AID-1234567\"\n  }'"
-          }
-        ]
+        }
       }
     }
   },
