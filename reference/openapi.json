@@ -19,6 +19,16 @@
       "url": "https://api.telegent.com"
     }
   ],
+  "x-readme": {
+    "samples-languages": [
+      "http",
+      "curl",
+      "node",
+      "python",
+      "csharp",
+      "php"
+    ]
+  },
   "security": [
     {
       "BearerAuth": []
