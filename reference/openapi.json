@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "https://api.telegent.com/v1.0"
+      "url": "https://api.telegent.com"
     }
   ],
   "security": [

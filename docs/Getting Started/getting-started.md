@@ -1,48 +1,40 @@
 ---
-title: Welcome to Demo_Preview
+title: Telegent mPaaS API
+excerpt: Provision numbers, send messages, configure voice routing, and manage subscribers — all through a single REST API.
 hidden: false
 ---
-<Callout icon="📘" theme="info">
-  **Template:**  Delete this callout and edit this page with your content and links.
-</Callout>
+Telegent mPaaS is a Mobile Platform as a Service API that lets you build and manage mobile services — from provisioning phone numbers to sending messages and routing calls — without owning carrier infrastructure.
 
 <Cards>
-  {/* Edit the props below to customize these components */}
-  <Card title="Quick Start" href="#" icon="fa-duotone fa-rocket-launch">Learn how to get started with our product</Card>
-
-  <Card title="API Reference" href="#" icon="fa-duotone fa-code-simple">Explore endpoints and build your integration</Card>
-
-  <Card title="Build with AI" href="#" icon="fa-duotone fa-sparkles">Use LLM features to automate your workflow</Card>
+  <Card title="Get Started — Partner Onboarding" href="/docs/onboarding-overview" icon="fa-duotone fa-rocket-launch">Follow the Partner Onboarding plan to go from POC kickoff to a live, production-ready integration.</Card>
 </Cards>
 
 <br />
 
-## Recent Releases
+## What you can build
 
 <Cards>
-  <Card isNew kind="tile" title="v2.0 Migration" href="#" icon="fa-duotone fa-magnifying-glass">Everything you need to upgrade</Card>
+  <Card kind="tile" title="Phone Number Provisioning" href="/reference/post_v1-0-numbers-availability" icon="fa-duotone fa-phone">Provision and manage MVNO and IoT numbers by area code or zip code</Card>
 
-  <Card kind="tile" title="Webhooks" href="#" icon="fa-duotone fa-bullhorn">Real-time events are now available</Card>
+  <Card kind="tile" title="SMS & MMS Messaging" href="/reference/post_v1-0-message-outbound" icon="fa-duotone fa-message">Send and receive A2P and P2P messages with delivery callbacks</Card>
 
-  <Card kind="tile" title="Android SDK" href="#" icon="fa-duotone fa-robot">Our native Android library is out of beta</Card>
+  <Card kind="tile" title="Voice Routing" href="/reference/post_v1-0-voice-routes" icon="fa-duotone fa-phone-volume">Configure SIP trunks, IVR menus, workgroups, and call routing rules</Card>
+
+  <Card kind="tile" title="Number Porting" href="/reference/post_v1-0-numbers-portin" icon="fa-duotone fa-arrows-left-right">Port numbers in and out of Telegent from other carriers</Card>
+
+  <Card kind="tile" title="Subscriber Management" href="/reference/get_v1-0-subscribers-get" icon="fa-duotone fa-users">Create end-user accounts and assign numbers, plans, and permissions</Card>
+
+  <Card kind="tile" title="AI Guardian" href="/reference/post_v1-0-subscribers-message-filter" icon="fa-duotone fa-shield">Apply content filtering, parental controls, and call/message blocking per subscriber</Card>
 </Cards>
 
 <br />
 
-## The Basics
+## Explore the API
 
 <Cards>
-  <Card kind="tile" title="Customize" href="#" icon="fa-duotone fa-brush">Style the widget to match your brand</Card>
+  <Card kind="tile" title="API Reference" href="/reference" icon="fa-duotone fa-book">Full endpoint documentation with interactive examples</Card>
 
-  <Card kind="tile" title="Integrations" href="#" icon="fa-duotone fa-arrow-down-left-and-arrow-up-right-to-center">Connect with third-party services</Card>
+  <Card kind="tile" title="Quick Start Guide" href="/docs/quick-start-guide" icon="fa-duotone fa-bolt">From authentication to your first working setup</Card>
 
-  <Card kind="tile" title="CLI" href="#" icon="fa-duotone fa-terminal">Manage resources from your terminal</Card>
-
-  <Card kind="tile" title="Security" href="" icon="fa-duotone fa-shield-dog">Learn how we secure your data</Card>
-
-  <Card kind="tile" title="Common Issues" href="" icon="fa-duotone fa-file-circle-info">Troubleshoot common issues</Card>
-
-  <Card kind="tile" title="Sync" href="#" icon="fa-duotone fa-code-compare">Connect to a storage provider</Card>
+  <Card kind="tile" title="Support" href="https://support.telegent.com/support/home" icon="fa-duotone fa-life-ring">Visit our support portal for help and resources</Card>
 </Cards>
-
-<br />

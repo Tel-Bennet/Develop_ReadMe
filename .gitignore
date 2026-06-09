@@ -1,2 +1,6 @@
 .DS_Store
 Thumbs.db
+
+# Output of scripts/mintlify-to-readme.mjs — staging area for converted
+# Mintlify pages. Promote files into docs/ or reference/ before publishing.
+_converted/
