@@ -1,12 +1,14 @@
 ---
 title: Telegent mPaaS API
-excerpt: Provision numbers, send messages, configure voice routing, and manage subscribers — all through a single REST API.
+excerpt: >-
+  Provision numbers, send messages, configure voice routing, and manage
+  subscribers — all through a single REST API.
 hidden: false
 ---
-Telegent mPaaS is a Mobile Platform as a Service API that lets you build and manage mobile services — from provisioning phone numbers to sending messages and routing calls — without owning carrier infrastructure.
+Telegent mPaaS is a Mobile Platform as a Service API for building and managing mobile services. Provision phone numbers, send messages, and route calls without owning carrier infrastructure.
 
 <Cards>
-  <Card title="Get Started — Partner Onboarding" href="/docs/onboarding-overview" icon="fa-duotone fa-rocket-launch">Follow the Partner Onboarding plan to go from POC kickoff to a live, production-ready integration.</Card>
+  <Card title="Get Started — Partner Onboarding" href="/docs/onboarding-overview" icon="fa-duotone fa-rocket-launch">Follow the Partner Onboarding plan to go from proof of concept (POC) kickoff to a live, production-ready integration.</Card>
 </Cards>
 
 <br />
@@ -14,7 +16,7 @@ Telegent mPaaS is a Mobile Platform as a Service API that lets you build and man
 ## What you can build
 
 <Cards>
-  <Card kind="tile" title="Phone Number Provisioning" href="/reference/post_v1-0-numbers-availability" icon="fa-duotone fa-phone">Provision and manage MVNO and IoT numbers by area code or zip code</Card>
+  <Card kind="tile" title="Phone Number Provisioning" href="/reference/post_v1-0-numbers-availability" icon="fa-duotone fa-phone">Provision and manage mobile virtual network operator (MVNO) and Internet of Things (IoT) numbers by area code or zip code</Card>
 
   <Card kind="tile" title="SMS & MMS Messaging" href="/reference/post_v1-0-message-outbound" icon="fa-duotone fa-message">Send and receive A2P and P2P messages with delivery callbacks</Card>
 
