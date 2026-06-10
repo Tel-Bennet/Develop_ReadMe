@@ -4,7 +4,7 @@ description: Recipe Description
 hidden: false
 recipe:
   color: '#018FF4'
-  icon: 🦉
+  icon: 📱
 ---
 ```json JSON
 {
@@ -20,21 +20,6 @@ recipe:
   "ICCID": "8901240397190195850",
   "ProductType": "Sms+Data",
   "AssignedSubscriberId": "TSUID-1234567999"
-}
-```
-
-```json Response Example
-{
-  "OrderDate": "2025-10-29T12:36:19.338438+00:00",
-  "OrderId": "JNUOID-76ba71a8-d7a6-4489-b695-1ad363b8d596",
-  "OrderStatus": "Complete",
-  "PhoneNumberAssigned": "+18016025346",
-  "PhoneNumberId": "NID-8bdf915a-ef65-46c9-8c66-96c98d42d9ca",
-  "QRCode": "https://quickchart.io/qr?text=LPA:1$T-MOBILE.IDEMIA.IO$LX9G1-Q12VI-CIIWA-WAQIN&centerImageUrl=https://joonto.com/wp-content/uploads/2022/07/cropped-Joonto-2022-Square-Icon-Black-Background.png&ecLevel=H&format=png&centerImageSizeRatio=.3",
-  "ZipCode": "84603",
-  "ICCID": "12345678900987654321",
-  "ErrorMessage": null,
-  "SubscriberId": "TSUID-ac59a1f8-36b6-42cc-b124-c2aa29f7e3d2"
 }
 ```
 
