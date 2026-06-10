@@ -1,5 +1,6 @@
 - oauth2
 - numbers
+- voice
 - accounts
 - distributors
 - message
@@ -9,6 +10,5 @@
 - sims
 - subscribers
 - subscriptions
-- voice
 - workgroups
 - webhooks
