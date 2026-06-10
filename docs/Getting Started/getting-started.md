@@ -8,7 +8,7 @@ hidden: false
 Telegent mPaaS is a Mobile Platform as a Service API for building and managing mobile services. Provision phone numbers, send messages, and route calls without owning carrier infrastructure.
 
 <Cards>
-  <Card title="Get Started — Partner Onboarding" href="/docs/onboarding-overview" icon="fa-duotone fa-rocket-launch">Follow the Partner Onboarding plan to go from proof of concept (POC) kickoff to a live, production-ready integration.</Card>
+  <Card kind="tile" title="Get Started — Partner Onboarding" href="/docs/onboarding-overview" icon="fa-duotone fa-rocket-launch">Follow the Partner Onboarding plan to go from proof of concept (POC) kickoff to a live, production-ready integration.</Card>
 </Cards>
 
 <br />
