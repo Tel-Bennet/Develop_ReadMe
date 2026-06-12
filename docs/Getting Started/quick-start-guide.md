@@ -18,8 +18,6 @@ This guide walks you through the complete process of setting up your first Teleg
 > - Create a subscriber
 > - Send a test message
 
-<img src="/images/number_provisioning_flow.svg" alt="Number provisioning flow — step-by-step diagram from authentication through to verifying a provisioned number" />
-
 ## Prerequisites
 
 - **[API Credentials](#)** — You'll need an `AccountKey` and `AccountSecret` from your Telegent representative
