@@ -5,7 +5,6 @@ excerpt: >-
   subscribers — all through a single REST API.
 hidden: false
 ---
-<img src="/images/telegent-logo.svg" alt="Telegent mPaaS" width="280" />
 
 Telegent mPaaS is a Mobile Platform as a Service API that lets you build and manage mobile services — from provisioning phone numbers to sending messages and routing calls — without owning carrier infrastructure.
 

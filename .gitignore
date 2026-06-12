@@ -4,3 +4,5 @@ Thumbs.db
 # Output of scripts/mintlify-to-readme.mjs — staging area for converted
 # Mintlify pages. Promote files into docs/ or reference/ before publishing.
 _converted/
+# Local scratch: paste-ready changelog post bodies for manual entry in ReadMe UI
+CHANGELOG_POSTS.txt
