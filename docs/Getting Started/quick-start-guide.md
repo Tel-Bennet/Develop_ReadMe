@@ -1,10 +1,9 @@
 ---
 title: API Quick Start Guide
-slug: quick-start-guide
-excerpt: "Complete walkthrough: From authentication to your first working setup"
+excerpt: 'Complete walkthrough: From authentication to your first working setup'
 hidden: false
+slug: quick-start-guide
 ---
-
 ## Overview
 
 This guide walks you through the complete process of setting up your first Telegent number, configuring messaging and voice routes, and creating a subscriber. By the end, you'll have sent your first test message!
@@ -13,21 +12,21 @@ This guide walks you through the complete process of setting up your first Teleg
 >
 > **What You'll Build:**
 >
->   - Authenticate with the API
->   - Set up message and voice routing
->   - Provision a phone number
->   - Create a subscriber
->   - Send a test message
+> - Authenticate with the API
+> - Set up message and voice routing
+> - Provision a phone number
+> - Create a subscriber
+> - Send a test message
 
 <img src="/images/number_provisioning_flow.svg" alt="Number provisioning flow — step-by-step diagram from authentication through to verifying a provisioned number" />
 
 ## Prerequisites
 
-  - **[API Credentials](#)** — You'll need an `AccountKey` and `AccountSecret` from your Telegent representative
+- **[API Credentials](#)** — You'll need an `AccountKey` and `AccountSecret` from your Telegent representative
 
-  - **[API Tool](#)** — Postman, cURL, or any HTTP client for making API requests
+- **[API Tool](#)** — Postman, cURL, or any HTTP client for making API requests
 
----
+***
 
 ## Step 1: Authenticate
 
@@ -43,61 +42,6 @@ All API calls require a Bearer token. Get yours first by authenticating with you
 }
 ```
 
-```bash cURL
-curl --request POST \
-  --url https://api.telegent.com/v1.0/oauth2/tokens \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "AccountKey": "YOUR_ACCOUNT_KEY",
-    "AccountSecret": "YOUR_ACCOUNT_SECRET",
-    "ApiEndpoint": "https://api.telegent.com/v1.0/numbers/provision"
-  }'
-```
-
-```javascript Node.js
-const response = await fetch('https://api.telegent.com/v1.0/oauth2/tokens', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    AccountKey: 'YOUR_ACCOUNT_KEY',
-    AccountSecret: 'YOUR_ACCOUNT_SECRET',
-    ApiEndpoint: 'https://api.telegent.com/v1.0/numbers/provision'
-  })
-});
-const { token } = await response.json();
-```
-
-```python Python
-import requests
-
-data = requests.post(
-    'https://api.telegent.com/v1.0/oauth2/tokens',
-    json={
-        'AccountKey': 'YOUR_ACCOUNT_KEY',
-        'AccountSecret': 'YOUR_ACCOUNT_SECRET',
-        'ApiEndpoint': 'https://api.telegent.com/v1.0/numbers/provision'
-    }
-).json()
-token = data['token']
-```
-
-```php PHP
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.telegent.com/v1.0/oauth2/tokens');
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'AccountKey' => 'YOUR_ACCOUNT_KEY',
-    'AccountSecret' => 'YOUR_ACCOUNT_SECRET',
-    'ApiEndpoint' => 'https://api.telegent.com/v1.0/numbers/provision'
-]));
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-$response = curl_exec($ch);
-$data = json_decode($response, true);
-$token = $data['token'];
-```
-
 **Response:**
 
 ```json
@@ -110,13 +54,13 @@ $token = $data['token'];
 
 > 📘 **Note**
 >
-> **`ApiEndpoint`** scopes the token to a specific endpoint URL for security. Generate a separate token for each endpoint you call.
+> `ApiEndpoint` scopes the token to a specific endpoint URL for security. Generate a separate token for each endpoint you call.
 
 > ✅ **Success**
 >
 > **Save this token!** You'll need it in the `Authorization: Bearer` header for all subsequent requests.
 
----
+***
 
 ## Step 2: Create Message Route
 
@@ -166,13 +110,13 @@ Message routes define how SMS/MMS messages are delivered to your system. This is
 
 > ✅ **Success**
 >
-> **`Save the MessageRouteId`** (also called MRID) - required for number provisioning.
+> `Save the MessageRouteId` (also called MRID) - required for number provisioning.
 
 > 🚧 **Warning**
 >
 > Without a message route, you cannot provision numbers! Make sure this is set up before moving to Step 4.
 
----
+***
 
 ## Step 3: Create Voice Route (Optional - MVNO Only)
 
@@ -262,9 +206,9 @@ Voice routes define where inbound calls are directed. Only required if you're of
 
 > ✅ **Success**
 >
-> **`Save the CallRouteId`** (also called CRID) if you created one.
+> `Save the CallRouteId` (also called CRID) if you created one.
 
----
+***
 
 ## Step 4: Check Available Phone Numbers
 
@@ -312,24 +256,21 @@ Before provisioning a number, check what's available in your desired area. This 
 
 ### Field Notes
 
-  
 ### NumberType
 
 `"mobile"` or `"voip"` — note: when **provisioning** a number, the valid values are `"mvno"`, `"iot"`, or `"voip"`
 
-  
 ### MessageType
 
 `"a2p"` or `"p2p"`
 
-  
 ### AreaCode & ZipCode
 
 - **AreaCode**: 3-digit area code (leave blank `""` for all available area codes and zipcodes)
-    - **ZipCode**: 5-digit zip code (if area code unavailable, system looks at zipcode)
-    - **Note**: You can input both, but AreaCode searches first if included. If both are blank/NULL, randomized results are returned.
+  - **ZipCode**: 5-digit zip code (if area code unavailable, system looks at zipcode)
 
-  
+  - **Note**: You can input both, but AreaCode searches first if included. If both are blank/NULL, randomized results are returned.
+
 ### PageNumber
 
 Pagination limits 10,000 per page
@@ -346,7 +287,7 @@ Pagination limits 10,000 per page
 >
 > Review the `ResultsTotal` count to confirm numbers are available in your desired area before provisioning.
 
----
+***
 
 ## Step 5: Create Subscriber
 
@@ -381,9 +322,9 @@ Create the end user who will use the phone number.
 
 > ✅ **Success**
 >
-> **`Save the SubscriberId`**
+> `Save the SubscriberId`
 
----
+***
 
 ## Step 6: Provision Phone Number
 
@@ -425,13 +366,13 @@ Now provision a phone number in your desired area.
 
 > ✅ **Success**
 >
-> **`Save the PhoneNumberAssigned and PhoneNumberId`** for the next step.
+> `Save the PhoneNumberAssigned and PhoneNumberId` for the next step.
 
 > 📘 **Note**
 >
-> **`ProductType`** options: `Sms-Only`, `Data-Only`, `Sms+Data`, `Sms+Data+Voice`. `ICCID` and `AssignedSubscriberId` are optional.
+> `ProductType` options: `Sms-Only`, `Data-Only`, `Sms+Data`, `Sms+Data+Voice`. `ICCID` and `AssignedSubscriberId` are optional.
 
----
+***
 
 ## Step 7: Test Your Setup
 
@@ -445,69 +386,6 @@ Send a test SMS message to verify everything is working.
   "From": "+18018018011",
   "Body": "Hello there!!!"
 }
-```
-
-```bash cURL
-curl --request POST \
-  --url https://api.telegent.com/v1.0/message/outbound \
-  --header 'Authorization: Bearer YOUR_TOKEN' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "To": [{"Number": "+18015737111"}],
-    "From": "+18018018011",
-    "Body": "Hello there!!!"
-  }'
-```
-
-```javascript Node.js
-const response = await fetch('https://api.telegent.com/v1.0/message/outbound', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    To: [{ Number: '+18015737111' }],
-    From: '+18018018011',
-    Body: 'Hello there!!!'
-  })
-});
-const message = await response.json();
-```
-
-```python Python
-import requests
-
-message = requests.post(
-    'https://api.telegent.com/v1.0/message/outbound',
-    headers={
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    },
-    json={
-        'To': [{'Number': '+18015737111'}],
-        'From': '+18018018011',
-        'Body': 'Hello there!!!'
-    }
-).json()
-```
-
-```php PHP
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.telegent.com/v1.0/message/outbound');
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'To' => [['Number' => '+18015737111']],
-    'From' => '+18018018011',
-    'Body' => 'Hello there!!!'
-]));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $token,
-    'Content-Type: application/json'
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-$message = json_decode(curl_exec($ch), true);
 ```
 
 **Response:**
@@ -526,112 +404,101 @@ $message = json_decode(curl_exec($ch), true);
 }
 ```
 
----
+***
 
 ## 🎉 Success!
 
 You've completed your first setup! You now have:
 
-  
 #### Authenticated
 
 ✅ Successfully authenticated with the API
 
-  
 #### Routes Configured
 
 ✅ Message and Voice routes configured
 
-  
 #### Number Provisioned
 
 ✅ A phone number provisioned
 
-  
 #### Subscriber Active
 
 ✅ A subscriber with an active number
 
-  
 #### Message Sent
 
 ✅ A test message sent
 
----
+***
 
 ## What's Next?
 
 Now that you have the basics working, explore these advanced features:
 
-  - **[Add Data Limits](/api-reference/intelligent-mobile-numbers)** — Set data caps or throttling for IoT and mobile data plans
+- **[Add Data Limits](/api-reference/intelligent-mobile-numbers)** — Set data caps or throttling for IoT and mobile data plans
 
-  - **[Port-In Numbers](/api-reference/intelligent-mobile-numbers)** — Transfer phone numbers from other carriers
+- **[Port-In Numbers](/api-reference/intelligent-mobile-numbers)** — Transfer phone numbers from other carriers
 
-  - **[Create Packages](/api-reference/products)** — Build service plans to offer to customers
+- **[Create Packages](/api-reference/products)** — Build service plans to offer to customers
 
-  - **[Subscriptions](/api-reference/products)** — Create subscription-based billing
+- **[Subscriptions](/api-reference/products)** — Create subscription-based billing
 
----
+***
 
 ## Key Concepts
 
-  
 ### Phone Number Formats
 
 All phone numbers use **E.164 format**: `+<country_code><number>`
 
-    Examples:
-    - US: `+18015551234`
-    - UK: `+442071234567`
+```
+Examples:
+- US: `+18015551234`
+- UK: `+442071234567`
+```
 
-  
 ### Message Types
 
 - **A2P** (Application-to-Person): Business messaging to consumers
-    - **P2P** (Person-to-Person): Individual messaging between users
+  - **P2P** (Person-to-Person): Individual messaging between users
 
-  
 ### Number Classifications
 
 - **MVNO**: Mobile virtual network operator numbers (full mobile service)
-    - **IoT**: Internet of Things capable numbers (data-focused)
-    - **VoIP**: Voice over IP numbers
+  - **IoT**: Internet of Things capable numbers (data-focused)
 
-  
+  - **VoIP**: Voice over IP numbers
+
 ### Token Scoping
 
 Each token is scoped to a specific `ApiEndpoint` URL for security. Generate a separate token for each endpoint you call. Tokens expire at the time specified in `tokenExpiry` — request a new one using the same credentials when expired.
 
----
+***
 
 ## Common Issues & Solutions
 
-  
 ### 401 Unauthorized
 
 **Solution:** Check that your Bearer token is correct and included in the Authorization header.
 
-  
 ### MessageRouteId is required
 
 **Solution:** You must create a Message Route (Step 3) before provisioning numbers. Message routes are required for ALL subscribers.
 
-  
 ### Phone number already in use
 
 **Solution:** The number you selected was claimed by another user. Check availability again and select a different number.
 
-  
 ### Email already exists
 
 **Solution:** Each subscriber email must be unique across the entire platform. Try a different email address.
 
-  
 ### Invalid AccountId
 
 **Solution:** Make sure you're using the correct AccountId provided by your Telegent representative.
 
----
+***
 
 ## API Base URL
 
@@ -647,23 +514,25 @@ https://api.telegent.com/v1.0
 https://api.telegent.com/v1.0/subscribers/create
 ```
 
----
+***
 
 ## Rate Limits
 
 - **Standard tier**: 50 requests per minute
 - **Enterprise tier**: Contact support for custom limits
 
----
+***
 
 ## Need Help?
 
-  - **[Full Documentation](/api-reference/introduction)** — Complete API reference with all endpoints
+- **[Full Documentation](/api-reference/introduction)** — Complete API reference with all endpoints
 
-  - **[Support](https://support.telegent.com/support/home)** — Visit our support portal for help and resources
+- **[Support](https://support.telegent.com/support/home)** — Visit our support portal for help and resources
 
----
+***
 
 > 📘 **Note**
 >
 > **Last Updated:** April 27, 2026
+
+<br />
