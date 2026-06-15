@@ -130,6 +130,6 @@ _Skip if data is not in scope._
 
 ---
 
-  - **[Previous: Phase 2 — Connectivity](/onboarding/phase-2)** — Webhooks and SIP interconnect
+  - **[Previous: Phase 2 — Connectivity](/docs/phase-2)** — Webhooks and SIP interconnect
 
-  - **[Next: Phase 4 — Production Cutover](/onboarding/phase-4)** — Move to production credentials and go live
+  - **[Next: Phase 4 — Production Cutover](/docs/phase-4)** — Move to production credentials and go live

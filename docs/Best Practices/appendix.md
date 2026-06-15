@@ -36,10 +36,10 @@ Every ID in Telegent has a prefix that tells you exactly what it refers to. When
 | `MessageRouteId required` | Routes | You skipped Phase 4. Create an MRID before `/numbers/provision`. |
 | `Email already exists` | Subscribers | Subscriber emails are unique platform-wide. Pick a different one. |
 | `Invalid AccountId` | Account | AID typo or you used a sandbox AID against production. Verify with your rep. |
-| `NumberType / MessageType mismatch` | Provisioning | `iot` = p2p only; `voip` = a2p only. Use `mvno` for a2p on a mobile line. |
+| `NumberType / MessageType mismatch` | Provisioning | `iot` = p2p only. Use `mvno` for a2p on a mobile line. |
 
 ---
 
-  - **[Back to Reference](/best-practices/reference)** — Full request/response payloads and field tables
+  - **[Back to Reference](/docs/reference)** — Full request/response payloads and field tables
 
-  - **[API Reference](/api-reference/introduction)** — Full OpenAPI spec with interactive playground
+  - **[API Reference](/reference/getting-started)** — Full OpenAPI spec with interactive playground

@@ -23,7 +23,7 @@ Run these alongside the matching phase. Skip any that don't apply to your use ca
 
 > 📘 **Note**
 >
-> For A2P, use `NumberType = "mvno"` and `MessageType = "a2p"` when provisioning numbers. `iot` numbers are p2p only; `voip` numbers are a2p only.
+> For A2P, use `NumberType = "mvno"` and `MessageType = "a2p"` when provisioning numbers. `iot` numbers are p2p only.
 
 ---
 
@@ -66,6 +66,6 @@ Run these alongside the matching phase. Skip any that don't apply to your use ca
 
 ---
 
-  - **[Back to Onboarding Overview](/onboarding)** — Full phase summary and navigation
+  - **[Back to Onboarding Overview](/docs/onboarding-overview)** — Full phase summary and navigation
 
-  - **[Best Practices Guide](/best-practices)** — Deep-dive API reference for MVNO provisioning
+  - **[Best Practices Guide](/docs/best-practices-overview)** — Deep-dive API reference for MVNO provisioning

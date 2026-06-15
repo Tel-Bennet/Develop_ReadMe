@@ -56,6 +56,6 @@ hidden: false
 
 ---
 
-  - **[Previous: Discovery & Setup](/onboarding/discovery)** — POC kickoff and NDA
+  - **[Previous: Discovery & Setup](/docs/discovery)** — POC kickoff and NDA
 
-  - **[Next: Phase 2 — Connectivity](/onboarding/phase-2)** — Configure webhooks and SIP interconnect
+  - **[Next: Phase 2 — Connectivity](/docs/phase-2)** — Configure webhooks and SIP interconnect

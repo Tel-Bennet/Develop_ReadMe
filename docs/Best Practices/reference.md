@@ -422,7 +422,7 @@ A Subscription is the billing relationship: one Subscriber, one Package, one num
   "TNID":  "NID-…",
   "ICCID": "8901240397190002080",
   "PackageId": "PKID-…",
-  "Type": "Voip"
+  "Type": "Mvno"
 }
 ```
 
@@ -433,7 +433,7 @@ A Subscription is the billing relationship: one Subscriber, one Package, one num
   "TNID": "NID-…",
   "ICCID": "8901240397190002080",
   "PackageId": "PKID-…",
-  "Type": "Voip",
+  "Type": "Mvno",
   "Active": true
 }
 ```
@@ -446,7 +446,7 @@ A Subscription is the billing relationship: one Subscriber, one Package, one num
 | `TNID` | string | The number identifier issued by `/numbers/provision` or `/numbers/portin`. |
 | `ICCID` | string | Optional. Bind the SIM to this Subscription. |
 | `PackageId` | string | PKID from Section 6.2. |
-| `Type` | string | `Voip`, `Mvno`, `Iot` — must match the kind of number the Subscription is on. |
+| `Type` | string | `Mvno`, `Iot` — must match the kind of number the Subscription is on. |
 
 > 📘 **Note**
 >
@@ -535,7 +535,7 @@ Once you have an available area, purchase and activate the number. Supply the `M
 
 > 📘 **Note**
 >
-> **NumberType rules to remember:** `iot` numbers are p2p only — never a2p. `voip` numbers are a2p only. For a2p messaging on a mobile-style line, use `NumberType = "mvno"`.
+> **NumberType rules to remember:** `iot` numbers are p2p only — never a2p. For a2p messaging on a mobile-style line, use `NumberType = "mvno"`.
 
 ### 8.2 Port a number in — the full lifecycle
 

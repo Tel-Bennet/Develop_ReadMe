@@ -256,7 +256,7 @@ Before provisioning a number, check what's available in your desired area. This 
 
 ### NumberType
 
-`"mobile"` or `"voip"` — note: when **provisioning** a number, the valid values are `"mvno"`, `"iot"`, or `"voip"`
+`"mobile"` — note: when **provisioning** a number, the valid values are `"mvno"` or `"iot"`
 
 ### MessageType
 
@@ -434,13 +434,13 @@ You've completed your first setup! You now have:
 
 Now that you have the basics working, explore these advanced features:
 
-- **[Add Data Limits](/api-reference/intelligent-mobile-numbers)** — Set data caps or throttling for IoT and mobile data plans
+- **[Add Data Limits](/reference/numbers)** — Set data caps or throttling for IoT and mobile data plans
 
-- **[Port-In Numbers](/api-reference/intelligent-mobile-numbers)** — Transfer phone numbers from other carriers
+- **[Port-In Numbers](/reference/numbers)** — Transfer phone numbers from other carriers
 
-- **[Create Packages](/api-reference/products)** — Build service plans to offer to customers
+- **[Create Packages](/reference/packages)** — Build service plans to offer to customers
 
-- **[Subscriptions](/api-reference/products)** — Create subscription-based billing
+- **[Subscriptions](/reference/subscriptions)** — Create subscription-based billing
 
 ***
 
@@ -465,8 +465,6 @@ Examples:
 
 - **MVNO**: Mobile virtual network operator numbers (full mobile service)
   - **IoT**: Internet of Things capable numbers (data-focused)
-
-  - **VoIP**: Voice over IP numbers
 
 ### Token Scoping
 
@@ -523,7 +521,7 @@ https://api.telegent.com/v1.0/subscribers/create
 
 ## Need Help?
 
-- **[Full Documentation](/api-reference/introduction)** — Complete API reference with all endpoints
+- **[Full Documentation](/reference/getting-started)** — Complete API reference with all endpoints
 
 - **[Support](https://support.telegent.com/support/home)** — Visit our support portal for help and resources
 

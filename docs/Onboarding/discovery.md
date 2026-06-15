@@ -30,6 +30,6 @@ hidden: false
 
 ---
 
-  - **[Back to Overview](/onboarding)** — Return to the full onboarding overview
+  - **[Back to Overview](/docs/onboarding-overview)** — Return to the full onboarding overview
 
-  - **[Next: Phase 1 — Credentials & Access](/onboarding/phase-1)** — Get credentials issued and the first OAuth token working
+  - **[Next: Phase 1 — Credentials & Access](/docs/phase-1)** — Get credentials issued and the first OAuth token working

@@ -35,16 +35,16 @@ This plan walks a new Telegent partner from POC kickoff through go-live and the 
 
 ## Phases
 
-  - **[Discovery & Setup](/onboarding/discovery)** — POC kickoff, NDA, scope alignment, and Slack channel setup
+  - **[Discovery & Setup](/docs/discovery)** — POC kickoff, NDA, scope alignment, and Slack channel setup
 
-  - **[Phase 1 — Credentials & Access](/onboarding/phase-1)** — Credentials issued, console access, first OAuth token generated
+  - **[Phase 1 — Credentials & Access](/docs/phase-1)** — Credentials issued, console access, first OAuth token generated
 
-  - **[Phase 2 — Connectivity](/onboarding/phase-2)** — Webhooks configured, CDR delivery set up, SIP interconnect (if applicable)
+  - **[Phase 2 — Connectivity](/docs/phase-2)** — Webhooks configured, CDR delivery set up, SIP interconnect (if applicable)
 
-  - **[Phase 3 — API Walkthrough & Testing](/onboarding/phase-3)** — End-to-end sandbox testing of all Intelligent API categories
+  - **[Phase 3 — API Walkthrough & Testing](/docs/phase-3)** — End-to-end sandbox testing of all Intelligent API categories
 
-  - **[Phase 4 — Production Cutover](/onboarding/phase-4)** — Production credentials, first live number, monitoring in place
+  - **[Phase 4 — Production Cutover](/docs/phase-4)** — Production credentials, first live number, monitoring in place
 
-  - **[Phase 5 — Post-launch](/onboarding/phase-5)** — CDR reconciliation, billing review, 30-day retro
+  - **[Phase 5 — Post-launch](/docs/phase-5)** — CDR reconciliation, billing review, 30-day retro
 
-  - **[Conditional Add-ons](/onboarding/add-ons)** — A2P (10DLC), IoT, and Static IP / private APN add-ons
+  - **[Conditional Add-ons](/docs/add-ons)** — A2P (10DLC), IoT, and Static IP / private APN add-ons

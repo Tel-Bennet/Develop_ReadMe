@@ -64,6 +64,6 @@ The first live number must be provisioned in this exact dependency order:
 
 ---
 
-  - **[Previous: Phase 3 — API Walkthrough & Testing](/onboarding/phase-3)** — Sandbox testing sign-off
+  - **[Previous: Phase 3 — API Walkthrough & Testing](/docs/phase-3)** — Sandbox testing sign-off
 
-  - **[Next: Phase 5 — Post-launch](/onboarding/phase-5)** — First 30 days stabilization
+  - **[Next: Phase 5 — Post-launch](/docs/phase-5)** — First 30 days stabilization

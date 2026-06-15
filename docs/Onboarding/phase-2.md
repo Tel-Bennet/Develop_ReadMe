@@ -57,6 +57,6 @@ When an inbound SMS/MMS is delivered to your webhook, the payload includes:
 
 ---
 
-  - **[Previous: Phase 1 — Credentials & Access](/onboarding/phase-1)** — Credentials and first OAuth token
+  - **[Previous: Phase 1 — Credentials & Access](/docs/phase-1)** — Credentials and first OAuth token
 
-  - **[Next: Phase 3 — API Walkthrough & Testing](/onboarding/phase-3)** — End-to-end sandbox testing
+  - **[Next: Phase 3 — API Walkthrough & Testing](/docs/phase-3)** — End-to-end sandbox testing

@@ -33,6 +33,6 @@ hidden: false
 
 ---
 
-  - **[Previous: Phase 4 — Production Cutover](/onboarding/phase-4)** — First live number and go-live sign-off
+  - **[Previous: Phase 4 — Production Cutover](/docs/phase-4)** — First live number and go-live sign-off
 
-  - **[Conditional Add-ons](/onboarding/add-ons)** — A2P, IoT, and Static IP configuration
+  - **[Conditional Add-ons](/docs/add-ons)** — A2P, IoT, and Static IP configuration
