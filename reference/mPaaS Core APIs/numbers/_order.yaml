@@ -21,3 +21,5 @@
 - post_v1-0-numbers-device-details
 - post_v1-0-numbers-data-usage-update-renewal-info
 - post_v1-0-numbers-reactivate
+- get_v1-0-numbers-e911address
+- post_v1-0-numbers-e911address-update

@@ -44649,6 +44649,759 @@
         }
       }
     },
+    "/v1.0/numbers/e911address": {
+      "get": {
+        "tags": [
+          "Numbers"
+        ],
+        "summary": "Numbers - Get E911 Address",
+        "description": "Retrieve the E911 emergency address registered to a specific phone number. Returns the street address on file that will be dispatched to emergency services when a 911 call is placed from this number.",
+        "parameters": [
+          {
+            "name": "PhoneNumber",
+            "in": "query",
+            "required": true,
+            "description": "Required. The E.164-formatted phone number to look up (e.g. `+12345678901`).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "AccountId",
+            "in": "query",
+            "required": false,
+            "description": "Account identifier (e.g. `AID-...`). Required for Distributors managing multiple accounts; omit when using single-account credentials.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "PhoneNumber": {
+                      "type": "string",
+                      "description": "The phone number the E911 address is registered to, in E.164 format."
+                    },
+                    "AccountId": {
+                      "type": "string",
+                      "description": "The account the number belongs to."
+                    },
+                    "E911Address": {
+                      "type": "object",
+                      "description": "The emergency address currently on file for the number.",
+                      "properties": {
+                        "Street1": {
+                          "type": "string",
+                          "description": "Primary street address line."
+                        },
+                        "Street2": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Secondary address line (suite, unit, etc.). Null when not set."
+                        },
+                        "City": {
+                          "type": "string",
+                          "description": "City name."
+                        },
+                        "State": {
+                          "type": "string",
+                          "description": "Two-letter US state abbreviation (e.g. UT)."
+                        },
+                        "Zip": {
+                          "type": "string",
+                          "description": "ZIP or ZIP+4 postal code."
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "PhoneNumber": "+13852217924",
+                      "AccountId": "AID-eab92510-1040-45a5-bb9c-xxxx",
+                      "E911Address": {
+                        "Street1": "2701 N THANKSGIVING WAY",
+                        "Street2": null,
+                        "City": "LEHI",
+                        "State": "UT",
+                        "Zip": "84048-6330"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 400,
+                      "Message": "Bad request: one or more required fields are missing or contain an invalid value."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest_Result"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 401,
+                      "Message": "Unauthorized: Bearer token is missing, expired, or invalid. Re-authenticate via POST /v1.0/oauth2/tokens."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized_Result"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 403,
+                      "Message": "Forbidden: your token does not have permission to access this resource. Check the ApiEndpoint scope."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden_Result"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 404,
+                      "Message": "Not found: the requested resource does not exist or belongs to a different account."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound_Result"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodNotAllowed_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodNotAllowed_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 405,
+                      "Message": "Method not allowed: verify the HTTP method required for this endpoint."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodNotAllowed_Result"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTimeout_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTimeout_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 408,
+                      "Message": "Request timeout: the server did not receive a complete request within the allowed time. Retry with exponential backoff."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTimeout_Result"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 429,
+                      "Message": "Too many requests: rate limit exceeded. Slow your request cadence and retry after a short delay."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests_Result"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 500,
+                      "Message": "Internal server error: an unexpected error occurred. If the problem persists contact support@telegent.com."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError_Result"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 503,
+                      "Message": "Service unavailable: the API is temporarily unavailable. Retry after a short delay."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable_Result"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Gateway Timeout",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayTimeout_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayTimeout_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 504,
+                      "Message": "Gateway timeout: an upstream service did not respond in time. Retry with exponential backoff."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayTimeout_Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1.0/numbers/e911address/update": {
+      "post": {
+        "tags": [
+          "Numbers"
+        ],
+        "summary": "Numbers - Update E911 Address",
+        "description": "Register or update the E911 emergency address for a phone number. This address is provided to emergency services when a 911 call is placed from the specified number. Addresses must match a valid MSAG (Master Street Address Guide) location.",
+        "requestBody": {
+          "description": "E911 address registration object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "PhoneNumber",
+                  "Street1",
+                  "City",
+                  "State",
+                  "Zip"
+                ],
+                "properties": {
+                  "PhoneNumber": {
+                    "type": "string",
+                    "description": "Required. The E.164-formatted phone number to register the address against (e.g. `+12345678901`)."
+                  },
+                  "AccountId": {
+                    "type": "string",
+                    "description": "Account identifier. Required for Distributors managing multiple accounts; omit when using single-account credentials."
+                  },
+                  "Street1": {
+                    "type": "string",
+                    "description": "Required. Primary street address line."
+                  },
+                  "Street2": {
+                    "type": "string",
+                    "description": "Secondary address line (suite, unit, etc.). Optional."
+                  },
+                  "City": {
+                    "type": "string",
+                    "description": "Required. City name."
+                  },
+                  "State": {
+                    "type": "string",
+                    "description": "Required. Two-letter US state abbreviation (e.g. UT)."
+                  },
+                  "Zip": {
+                    "type": "string",
+                    "description": "Required. ZIP or ZIP+4 postal code."
+                  }
+                }
+              },
+              "example": {
+                "PhoneNumber": "+12345678901",
+                "AccountId": "AID-eab92510-1040-45a5-bb9c-xxxx",
+                "Street1": "2701 N Thanksgiving Way",
+                "Street2": "",
+                "City": "Lehi",
+                "State": "UT",
+                "Zip": "84043"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "PhoneNumber": {
+                      "type": "string",
+                      "description": "The phone number the address was registered against, in E.164 format."
+                    },
+                    "Status": {
+                      "type": "string",
+                      "description": "Result of the registration (e.g. `Success`)."
+                    },
+                    "StatusMessage": {
+                      "type": "string",
+                      "description": "Additional detail about the result. Empty on success."
+                    }
+                  }
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "PhoneNumber": "+12345678901",
+                      "Status": "Success",
+                      "StatusMessage": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 400,
+                      "Message": "Bad request: one or more required fields are missing or contain an invalid value."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest_Result"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 401,
+                      "Message": "Unauthorized: Bearer token is missing, expired, or invalid. Re-authenticate via POST /v1.0/oauth2/tokens."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized_Result"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 403,
+                      "Message": "Forbidden: your token does not have permission to access this resource. Check the ApiEndpoint scope."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden_Result"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 404,
+                      "Message": "Not found: the requested resource does not exist or belongs to a different account."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound_Result"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodNotAllowed_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodNotAllowed_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 405,
+                      "Message": "Method not allowed: verify the HTTP method required for this endpoint."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodNotAllowed_Result"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTimeout_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTimeout_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 408,
+                      "Message": "Request timeout: the server did not receive a complete request within the allowed time. Retry with exponential backoff."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTimeout_Result"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 429,
+                      "Message": "Too many requests: rate limit exceeded. Slow your request cadence and retry after a short delay."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests_Result"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 500,
+                      "Message": "Internal server error: an unexpected error occurred. If the problem persists contact support@telegent.com."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError_Result"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 503,
+                      "Message": "Service unavailable: the API is temporarily unavailable. Retry after a short delay."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable_Result"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Gateway Timeout",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayTimeout_Result"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayTimeout_Result"
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "StatusCode": 504,
+                      "Message": "Gateway timeout: an upstream service did not respond in time. Retry with exponential backoff."
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayTimeout_Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1.0/numbers/reactivate": {
       "post": {
         "tags": [
